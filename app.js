@@ -6,6 +6,7 @@ const session = require('express-session');
 // custom
 const db = require('./config/db');
 const userRoute = require('./routes/userRouter');
+const adminRoute = require('./routes/adminRouter');
 const passport = require('./config/passport');
 
 db()
@@ -44,6 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/', userRoute);
+app.use('/admin', adminRoute);
 
 // Start server
 app.listen(process.env.PORT, () => {

@@ -406,6 +406,7 @@ ol {
 
 .logo {
 	width: 100px;
+    margin-top: 20px;
 }
 
 
@@ -629,7 +630,74 @@ ol {
 	display: none;
 }
 
+/* sidebar */
 
+.wrapper {
+    display: flex; /* Use flexbox to align sidebar and content side by side */
+    flex-grow: 1; /* Ensure wrapper takes available space, leaving footer at bottom */
+  }
+
+.sidebar {
+    top: 90px;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    color: black;
+    padding-top: 20px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  
+.sidebar a {
+	color: #000;
+}
+
+.sidebar a:hover {
+	color: #3e3d3d;
+}
+
+  .sidebar ul {
+    list-style-type: none;
+  }
+  
+  .sidebar li {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .sidebar li:hover {
+    background-color: #ffffff;
+  }
+  
+  .icon {
+    margin-right: 15px;
+    font-size: 1.2em;
+  }
+  
+  .main-content {
+    padding: 20px;
+    flex-grow: 1;
+  }
+  
+  h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .pagination {
+	justify-content: center;
+}
+.table-container {
+	margin-top: 20px;
+}
+  
+#message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+}
 
 /*---------------------
   Hero
@@ -2024,7 +2092,6 @@ ol {
 -----------------------*/
 
 .footer {
-	margin: auto;
 	background: #2a2a2a;
 	padding-top: 70px;
 }
