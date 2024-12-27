@@ -657,7 +657,7 @@ ol {
 
 .hero__slider.owl-carousel .owl-nav button {
 	font-size: 36px;
-	color: #333333;
+	color: #ffffff;
 	position: absolute;
 	left: 75px;
 	top: 50%;
@@ -676,7 +676,7 @@ ol {
 }
 
 .hero__text h6 {
-	color: #e53637;
+	color: #ffa0a0;
 	font-size: 14px;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -691,7 +691,7 @@ ol {
 }
 
 .hero__text h2 {
-	color: #111111;
+	color: #ffffff;
 	font-size: 48px;
 	font-weight: 700;
 	line-height: 58px;
@@ -705,6 +705,7 @@ ol {
 }
 
 .hero__text p {
+	color: white;
 	font-size: 16px;
 	line-height: 28px;
 	margin-bottom: 35px;

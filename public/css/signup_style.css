@@ -154,3 +154,14 @@ body {
   position: relative;
   z-index: 500;
 }
+
+.f-pass {
+  color: #c1351d;
+  font-size: 0.875rem;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+.f-pass:hover {
+  color: #9e2813;
+  text-decoration: underline;
+}
