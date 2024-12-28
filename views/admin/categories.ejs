@@ -7,15 +7,12 @@
     <h1 class="my-4">Manage Categories</h1>
 
     <!-- Search Bar -->
-    <div class="d-flex justify-content-between mb-4">
-      <input
-        type="text"
-        id="searchBar"
-        class="form-control w-50"
-        placeholder="Search Category"
-        onkeyup="filterTable()"
-      />
-    </div>
+    <form method="GET">
+      <div class="input-group mb-3">
+        <input type="text" class="form-control col-6" name="search" placeholder="Search by name" aria-label="Search" aria-describedby="basic-addon2">
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+    </form>
 
     <!-- Table Container -->
     <div class="table-container">
@@ -25,6 +22,8 @@
             <th>Category Name</th>
             <th>Description</th>
             <th>Added On</th>
+            <th>Status</th>
+            <th>List / Unlist</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -35,11 +34,35 @@
             <td><%= category[i].description %></td>
             <td><%= new Date(category[i].createdAt).toLocaleString('en-US') %></td>
             <td>
+              <% if (category[i].isListed) { %>
+                <span class="badge rounded-pill alert-success" style="width: 60px;">
+                  Listed
+                </span>
+              <% } else { %>
+                <span class="badge rounded-pill alert-danger" style="width: 60px;">
+                  Unlisted
+                </span>
+              <% } %>
+            </td>
+            <td>
+              <% if (category[i].isListed) { %>
+              <button class="btn btn-danger" style="width: 70px;">
+                <a href="/admin/listCategory?id=<%= category[i]._id %>" class="text-white">Unlist</a>
+              </button>
+              <% } else { %>
+              <button class="btn btn-success" style="width: 70px;">
+                <a href="/admin/unlistCategory?id=<%= category[i]._id %>" class="text-white">List</a>
+              </button>
+              <% } %>
+            </td>
+            <td>
               <button class="btn btn-secondary" style="width: 80px">
                 <a href="/admin/edit-category?id=<%= category[i]._id %>" class="text-white" style="text-decoration: none"
                   >Edit</a
                 >
               </button>
+              </td>
+              <td>
               <button class="btn btn-danger" style="width: 80px" onclick="confirmDelete('<%= category[i]._id %>')">
                 Delete
               </button>
@@ -75,6 +98,8 @@
 </div>
 
 <%- include('../../views/partials/admin/footer') %>
+
+
 
 
 <script>

@@ -3,28 +3,63 @@ const Category = require('../../models/categorySchema');
 
 const categoryInfo = async (req, res) => {
     try {
-        
+        // Get search query from the request (defaults to an empty string if not provided)
+        let search = req.query.search || '';
         const page = parseInt(req.query.page) || 1;
         const limit = 4;
         const skip = (page - 1) * limit;
 
+        // Construct a filter object that will search based on the category name
+        const searchQuery = {
+            isDeleted: { $ne: true }
+        };
 
-        const categoryData = await Category.find({ isDeleted: { $ne: true } })
-        .sort({createdAt: -1})
-        .skip(skip)
-        .limit(limit);
-        
+        if (search) {
+            // Modify the query to include a search condition for category name
+            searchQuery.name = { $regex: '.*' + search + '.*', $options: 'i' };  // 'i' makes it case-insensitive
+        }
 
-        const totalCategories = await Category.countDocuments();
+        // Fetch categories with the applied search filter
+        const categoryData = await Category.find(searchQuery)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Count the total categories matching the search criteria
+        const totalCategories = await Category.countDocuments(searchQuery);
         const totalPages = Math.ceil(totalCategories / limit);
 
+        // Render the categories page with the search results
         res.render('categories', {
             category: categoryData,
             currentPage: page,
             totalCategories: totalCategories,
-            totalPages: totalPages
-        })
+            totalPages: totalPages,
+            search: search // Pass the search term to the view to keep it in the input box
+        });
 
+    } catch (error) {
+        console.error(error);
+        res.redirect('/admin/pageError');
+    }
+};
+
+const getListCategory = async (req, res) => {
+    try {
+        let id = req.query.id;
+        await Category.updateOne({_id: id}, {$set: {isListed: false}});
+        res.redirect('/admin/categories');
+    } catch (error) {
+        console.error(error);
+        res.redirect('/admin/pageError');
+    }
+}
+
+const getUnlistCategory = async (req, res) => {
+    try {
+        let id = req.query.id;
+        await Category.updateOne({_id: id}, {$set: {isListed: true}});
+        res.redirect('/admin/categories');
     } catch (error) {
         console.error(error);
         res.redirect('/admin/pageError');
@@ -40,25 +75,31 @@ const loadAddCategory = async (req, res) => {
 };
 
 const addCategory = async (req, res) => {
-    const {name, description} = req.body;
+    const { name, description } = req.body;
+    const lowerCaseName = name.trim().replace(/\s+/g, ' ').toLowerCase();
     try {
-        
-        const existingCategory = await Category.findOne({name});
-        if(existingCategory) {
-            return res.status(400).json({error: 'Category already exists...'});
+        // Check if the category already exists
+        const existingCategory = await Category.findOne({
+            name: { $regex: new RegExp("^" + lowerCaseName + "$", "i") }
+        });
+        if (existingCategory) {
+            return res.json({ success: false, message: 'Category already exists.' });
         }
 
-        const newCatgory = new Category({
+        // Create new category
+        const newCategory = new Category({
             name,
-            description
-        })
-        await newCatgory.save();
-        return res.redirect('/admin/categories');
+            description,
+        });
+        await newCategory.save();
+
+        // Respond with success message
+        return res.json({ success: true, message: 'Category added successfully.' });
 
     } catch (error) {
-        return res.status(500).json({error: 'Internal Server Error'});
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
-}
+};
 
 const mongoose = require('mongoose');
 
@@ -131,7 +172,12 @@ const deleteCategory = async (req, res) => {
         const { id } = req.params; // Get the category ID from the URL
     
         // Soft delete by setting 'deleted' to true
-        const category = await Category.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+        const category = await Category.findByIdAndUpdate(
+            id, { 
+                isListed: false,
+                isDeleted: true,
+            }, { new: true }
+        );
     
         if (!category) {
           return res.status(404).json({ error: 'Category not found' });
@@ -148,6 +194,8 @@ const deleteCategory = async (req, res) => {
 
 module.exports = {
     categoryInfo,
+    getListCategory,
+    getUnlistCategory,
     loadAddCategory,
     addCategory,
     loadEditCategory,

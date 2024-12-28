@@ -19,7 +19,8 @@ const customerInfo = async (req, res) => {
             isAdmin: false,
             $or: [
                 { name: { $regex: '.*' + search + '.*', $options: 'i' } },
-                { email: { $regex: '.*' + search + '.*', $options: 'i' } }
+                { email: { $regex: '.*' + search + '.*', $options: 'i' } },
+                { phone: { $regex: '.*' + search + '.*', $options: 'i' } }
             ]
         });
 
@@ -28,7 +29,8 @@ const customerInfo = async (req, res) => {
         res.render('users', {
             data: userData,
             currentPage: page,
-            totalPages: totalPages
+            totalPages: totalPages,
+            search: search
         });
 
     } catch (error) {

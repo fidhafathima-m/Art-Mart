@@ -4,7 +4,6 @@ const nodemailer = require('nodemailer');
 const env = require('dotenv').config();
 const bcrypt = require('bcrypt');
 
-
 // generate OTP
 const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -13,7 +12,6 @@ const generateOtp = () => {
 // verification mail
 const sendVeificationMail = async (email, otp) => {
     try {
-        
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             port: 587,
@@ -37,39 +35,35 @@ const sendVeificationMail = async (email, otp) => {
 
     } catch (error) {
         console.log('Error sending mail', error);
-        return false;
+        throw new Error('Failed to send verification email');
     }
 }
 
-//securing password
+// securing password
 const securePassword = async (password) => {
     try {
         const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
     } catch (error) {
         console.error('Error in hashing');
+        throw new Error('Failed to secure password');
     }
 }
 
 const pageNotFound = async (req, res) => {
     try {
-        
         res.render('page-404');
-
     } catch (error) {
-        
-        res.redirect('/pageNotFound');
-
+        console.log('Error loading 404 page', error);
+        res.status(500).send('Internal Server Error: Unable to load page.');
     }
 }
-
 
 const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user; 
 
         if (user) {
-            
             const userData = await User.findOne({ _id: user });
 
             if (userData) {
@@ -80,24 +74,20 @@ const loadHomePage = async (req, res) => {
                 res.render('home');
             }
         } else {
-            console.log('No user in session');
             res.render('home');
         }
     } catch (error) {
-        console.log('Home page not found', error);
-        res.status(500).send('Server error');
+        console.log('Error loading home page', error);
+        res.status(500).send('Internal Server Error: Unable to load home page.');
     }
 };
-
-
-
 
 const loadSignUp = async (req, res) => {
     try {
         res.render('signup');
     } catch (error) {
-        console.log('SignUp not loading');
-        res.status(500).send('Server error');
+        console.log('Error loading sign-up page', error);
+        res.status(500).send('Internal Server Error: Unable to load sign-up page.');
     }
 }
 
@@ -105,19 +95,18 @@ const loadShopping = async (req, res) => {
     try {
         res.render('shop');
     } catch (error) {
-        console.log('Shop page not loading');
-        res.status(500).send('Server error');
+        console.log('Error loading shopping page', error);
+        res.status(500).send('Internal Server Error: Unable to load shopping page.');
     }
 }
 
 const signUp = async (req, res) => {
     try {
-        
         const {name, phone, email, password, confirm_password} = req.body;
 
         if(password !== confirm_password) {
             return res.render('signup', {message: 'Passwords do not match'});
-        };
+        }
 
         const findUser = await User.findOne({email});
         if(findUser) {
@@ -138,8 +127,8 @@ const signUp = async (req, res) => {
         console.log('OTP sent', otp);
 
     } catch (error) {
-        console.error('Signup error', error);
-        res.redirect('/pageNotFound');
+        console.error('Error during signup', error);
+        res.status(500).send('Internal Server Error: Failed to complete signup.');
     }
 }
 
@@ -169,24 +158,21 @@ const verifyOtp = async (req, res) => {
 
     } catch (error) {
         console.error('Error verifying OTP', error);
-        res.status(500).json({success: false, message: 'An error occured.'});
+        res.status(500).json({success: false, message: 'Internal Server Error: Unable to verify OTP.'});
     }
 }
 
 const resendOtp = async (req, res) => {
     try {
-        // Check if userData is available in the session
         if (!req.session.userData || !req.session.userData.email) {
             return res.status(400).json({ success: false, message: 'Email not found in session' });
         }
 
         const { email } = req.session.userData;
 
-        // Generate OTP
         const otp = generateOtp();
-        req.session.userOtp = otp; // Save OTP in session
+        req.session.userOtp = otp; 
 
-        // Send OTP to email
         const emailSent = await sendVeificationMail(email, otp);
 
         if (emailSent) {
@@ -198,14 +184,12 @@ const resendOtp = async (req, res) => {
 
     } catch (error) {
         console.error('Error resending OTP:', error);
-        res.status(500).json({ success: false, message: 'Internal Server Error, please try again' });
+        res.status(500).json({ success: false, message: 'Internal Server Error: Failed to resend OTP' });
     }
 };
 
-
-const loadLogin = async(req, res) => {
+const loadLogin = async (req, res) => {
     try {
-        
         if(!req.session.user) {
             return res.render('login');
         } else {
@@ -213,7 +197,8 @@ const loadLogin = async(req, res) => {
         }
 
     } catch (error) {
-        res.render('pageNotFound');
+        console.log('Error loading login page', error);
+        res.status(500).send('Internal Server Error: Unable to load login page.');
     }
 }
 
@@ -244,39 +229,34 @@ const login = async (req, res) => {
         req.session.user = findUser._id;
         req.session.save((err) => {
             if (err) {
-              console.log("Session save error", err);
+                console.log("Session save error", err);
             }
             console.log("Session saved after login");
-          });
-        console.log('Session after login:', req.session);
+        });
+        // console.log('Session after login:', req.session);
         res.redirect('/');
 
     } catch (error) {
-        console.error('login error', error);
-        return res.render('login', { message: 'Login failed. Please try again later' });
+        console.error('Login error', error);
+        res.status(500).render('login', { message: 'Internal Server Error: Login failed. Please try again later.' });
     }
 };
 
 const logout = async (req, res) => {
     try {
-        
         req.session.destroy((err) => {
             if(err) {
                 console.log('Session destruction error', err.message);
-                return res.redirect('/pageNotFound');
+                return res.status(500).redirect('/pageNotFound');
             } 
-            return res.redirect('/login');
+            return res.redirect('/');
         });
-
 
     } catch (error) {
         console.log('Log out error', error);
-        res.redirect('/pageNotFound');
-        
+        res.status(500).redirect('/pageNotFound');
     }
 }
-
-
 
 module.exports = {
     loadHomePage,

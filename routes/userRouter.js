@@ -2,20 +2,21 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user/userController');
 const profileController = require('../controllers/user/profileController');
+const userAuth = require('../middlewares/auth');
 const passport = require('passport');
 
 router.get('/pageNotFound', userController.pageNotFound);
 router.get('/', userController.loadHomePage);
 
 //signup
-router.get('/signup', userController.loadSignUp);
+router.get('/signup',userAuth.isLogout, userController.loadSignUp);
 router.post('/signup', userController.signUp);
 router.post('/verify-otp', userController.verifyOtp);
 router.post('/resend-otp', userController.resendOtp);
 // google signup routes
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/google',userAuth.isLogout, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/auth/google/callback', passport.authenticate('google', {
+router.get('/auth/google/callback',userAuth.isLogout, passport.authenticate('google', {
     failureRedirect: '/signup'
 }), (req, res) => {
     console.log('Authenticated user:', req.user);  // For debugging
@@ -23,19 +24,19 @@ router.get('/auth/google/callback', passport.authenticate('google', {
     res.redirect('/');
 });
 
-router.get('/login', userController.loadLogin);
+router.get('/login',userAuth.isLogout, userController.loadLogin);
 router.post('/login', userController.login);
 
-router.get('/shop', userController.loadShopping);
+router.get('/shop',userAuth.isLogin, userController.loadShopping);
 
 router.get('/logout', userController.logout);
 
 // profile management
-router.get('/forgot-password', profileController.getForgetPass);
+router.get('/forgot-password',userAuth.isLogout, profileController.getForgetPass);
 router.post('/forgot-pass-valid', profileController.forgotPassValid);
 router.post('/verify-forgotPassOtp', profileController.verifyForgetPassOtp);
 router.post('/resend-forgot-otp', profileController.resendForgetPassOtp);
-router.get('/reset-password', profileController.resetPasswordLoad);
+router.get('/reset-password',userAuth.isLogout, profileController.resetPasswordLoad);
 router.post('/reset-password', profileController.resetPassword);
 
 
