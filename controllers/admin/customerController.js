@@ -39,25 +39,26 @@ const customerInfo = async (req, res) => {
     }
 }
 
-const customerBlocked = async(req, res) => {
+const customerBlocked = async (req, res) => {
     try {
-        let id = req.query.id;
-        await User.updateOne({_id: id}, {$set: {isBlocked: true}});
-        res.redirect('/admin/users');
+        let id = req.body.id; // Get the user ID from the POST request
+        await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
+        res.json({ success: true }); // Send success response
     } catch (error) {
-        res.redirect('/pageError');
+        res.json({ success: false, message: 'Error blocking user' }); // Send error response
     }
-}
+};
 
-const customerUnblocked = async(req, res) => {
+const customerUnblocked = async (req, res) => {
     try {
-        let id = req.query.id;
-        await User.updateOne({_id: id}, {$set: {isBlocked: false}});
-        res.redirect('/admin/users');
+        let id = req.body.id; // Get the user ID from the POST request
+        await User.updateOne({ _id: id }, { $set: { isBlocked: false } });
+        res.json({ success: true }); // Send success response
     } catch (error) {
-        res.redirect('/pageError');
+        res.json({ success: false, message: 'Error unblocking user' }); // Send error response
     }
-}
+};
+
 
 
 module.exports = {

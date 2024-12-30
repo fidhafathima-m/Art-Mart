@@ -1,0 +1,140 @@
+
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container">
+    <h1 class="my-4">Edit Product</h1>
+
+    <!-- Edit Product Form -->
+    <form id="editProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        <div class="form-group">
+            <label for="productName" class="form-label">Product Name</label>
+            <input type="text" id="productName" name="productName" class="form-control" value="<%= product.productName %>" required placeholder="Enter product name">
+        </div>
+
+        <div class="form-group">
+            <label for="description" class="form-label">Product Description</label>
+            <textarea id="description" name="description" class="form-control" required placeholder="Enter product description"><%= product.description %></textarea>
+        </div>
+
+        <!-- Price and Quantity -->
+        <div class="form-group row">
+            <label for="regularPrice" class="col-sm-2 col-form-label">Regular Price</label>
+            <div class="col-sm-4">
+                <input type="number" id="regularPrice" name="regularPrice" class="form-control"  placeholder="Enter regular price" value="<%= product.regularPrice %>" min="0" step="0.01">
+            </div>
+            <label for="salePrice" class="col-sm-2 col-form-label">Sale Price</label>
+            <div class="col-sm-4">
+                <input type="number" id="salePrice" name="salePrice" class="form-control"  placeholder="Enter sale price" value="<%= product.salePrice %>" min="0" step="0.01">
+            </div>
+        </div>
+
+        <!-- Quantity and Category -->
+        <div class="form-group row">
+            <label for="quantity" class="col-sm-2 col-form-label">Quantity</label>
+            <div class="col-sm-4">
+                <input type="number" id="quantity" name="quantity" class="form-control" value="<%= product.quantity %>" min="1">
+            </div>
+            <label for="category" class="col-sm-2 col-form-label">Category</label>
+            <div class="col-sm-4">
+                <select id="category" name="category" class="form-control">
+                    <% categories.forEach(function(category) { %>
+                        <option value="<%= category._id %>" 
+                            <% if (category._id.toString() === product.category.toString()) { %>
+                                selected
+                            <% } %>
+                        >
+                            <%= category.name %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+        </div>
+
+        <!-- Image Preview Section -->
+        <div class="form-group row">
+            <label for="productImages" class="col-sm-2 col-form-label">Product Images</label>
+            <div class="col-sm-10">
+                <input type="file" id="productImages" name="images" class="form-control" multiple accept="image/*">
+                <div id="imagePreview">
+                    <% if (product.productImage && product.productImage.length > 0) { %>
+                        <% product.productImage.forEach(function(image) { %>
+                            <img src="<%= image %>" class="img-thumbnail" style="width: 150px; margin-top: 10px;" onclick="openCropper('<%= image %>')" />
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Product</button>
+    </form>
+    </div>
+    
+    </div>
+
+    <!-- SweetAlert will be triggered here using AJAX -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Preview images before uploading
+        document.getElementById('productImages').addEventListener('change', function(event) {
+            const previewContainer = document.getElementById('imagePreview');
+            previewContainer.innerHTML = ''; // Clear any existing previews
+            const files = event.target.files;
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = e.target.result;
+                    imgElement.classList.add('img-thumbnail');
+                    imgElement.style.width = '150px';
+                    imgElement.style.marginTop = '10px';
+                    previewContainer.appendChild(imgElement);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        });
+
+        $('#editProductForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent normal form submission
+
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: new FormData(this), // Send form data including files
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = '/admin/products'; // Redirect after success
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Request Failed',
+                        text: 'There was an issue connecting to the server. Please try again.'
+                    });
+                }
+            });
+        });
+    </script>
+
+<%- include('../../views/partials/admin/footer') %>
+

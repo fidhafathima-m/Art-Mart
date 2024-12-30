@@ -46,15 +46,15 @@
             </td>
             <td>
               <% if (category[i].isListed) { %>
-              <button class="btn btn-danger" style="width: 70px;">
-                <a href="/admin/listCategory?id=<%= category[i]._id %>" class="text-white">Unlist</a>
-              </button>
+                  <button class="btn btn-danger" style="width: 70px;" onclick="toggleListing('<%= category[i]._id %>', false)">
+                      Unlist
+                  </button>
               <% } else { %>
-              <button class="btn btn-success" style="width: 70px;">
-                <a href="/admin/unlistCategory?id=<%= category[i]._id %>" class="text-white">List</a>
-              </button>
+                  <button class="btn btn-success" style="width: 70px;" onclick="toggleListing('<%= category[i]._id %>', true)">
+                      List
+                  </button>
               <% } %>
-            </td>
+          </td>
             <td>
               <button class="btn btn-secondary" style="width: 80px">
                 <a href="/admin/edit-category?id=<%= category[i]._id %>" class="text-white" style="text-decoration: none"
@@ -63,11 +63,11 @@
               </button>
               </td>
               <td>
-              <button class="btn btn-danger" style="width: 80px" onclick="confirmDelete('<%= category[i]._id %>')">
-                Delete
-              </button>
+                <button class="btn btn-danger" style="width: 80px" onclick="confirmDelete('<%= category[i]._id %>')">
+                  Delete
+                </button>
+              </td>
               
-            </td>
           </tr>
           <% } %>
         </tbody>
@@ -99,37 +99,97 @@
 
 <%- include('../../views/partials/admin/footer') %>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
 <script>
-    function confirmDelete(categoryId) {
-  if (confirm('Are you sure you want to delete this category?')) {
-    fetch(`/admin/delete-category/${categoryId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
+
+function toggleListing(id, isListed) {
+    // Create the appropriate URL based on the action
+    const url = isListed ? '/admin/unlistCategory' : '/admin/listCategory';
+
+    // Perform the AJAX request
+    $.ajax({
+      type: 'GET',  // You may need to change this to 'POST' if you prefer
+      url: url,
+      data: { id: id },
+      success: function(response) {
+        // If the request is successful, display a success message
+        if (response.success) {
+          Swal.fire({
+            icon: 'success',
+            title: isListed ? 'Category Listed' : 'Category Unlisted',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            // Reload the page to update the button state and reflect changes
+            location.reload();
+          });
+        }
       },
-    })
-    .then(response => {
-      if (response.ok) {
-        alert('Category soft deleted successfully!');
-        
-        // Find and remove the row from the table
-        const row = document.getElementById(categoryId); // Get the row by category ID
-        row.remove();  // Remove the row from the table
-      } else {
-        response.json().then(data => {
-          alert('Failed to delete the category: ' + data.error);
+      error: function() {
+        // If the request fails, show an error message
+        Swal.fire({
+          icon: 'error',
+          title: 'Request Failed',
+          text: 'There was an issue connecting to the server. Please try again.'
         });
       }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred while deleting the category.');
     });
   }
+
+  function confirmDelete(categoryId) {
+  // Show SweetAlert confirmation popup
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will not be able to recover this category!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Perform AJAX request to delete the category
+      $.ajax({
+        type: 'DELETE',
+        url: `/admin/delete-category/${categoryId}`,
+        success: function(response) {
+          if (response.message === 'Category soft deleted successfully') {
+            // Show success message with SweetAlert
+            Swal.fire({
+              icon: 'success',
+              title: 'Category deleted!',
+              text: 'The category was successfully deleted.',
+              showConfirmButton: false,
+              timer: 1500
+            });
+
+            // Find and remove the row from the table
+            const row = document.getElementById(categoryId); // Get the row by category ID
+            row.remove(); // Remove the row from the table
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete the category. Please try again later.'
+            });
+          }
+        },
+        error: function() {
+          Swal.fire({
+            icon: 'error',
+            title: 'Request Failed',
+            text: 'An error occurred while deleting the category. Please try again.'
+          });
+        }
+      });
+    }
+  });
 }
+
 
   </script>
   

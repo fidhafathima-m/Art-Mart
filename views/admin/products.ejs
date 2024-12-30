@@ -1,0 +1,146 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container">
+    <h1 class="my-4">Manage Products</h1>
+
+    <!-- Search Bar -->
+    <form method="GET">
+      <div class="input-group mb-3">
+        <input type="text" class="form-control col-6" name="search" placeholder="Search by name" aria-label="Search" aria-describedby="basic-addon2">
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+    </form>
+
+    <!-- Table Container -->
+    <div class="table-container">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Regular Price</th>
+            <th>Sale Price</th>
+            <th>Added On</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="userTable">
+          <% for(let i = 0; i < product.length; i++) { %>
+          <tr id="<%= product[i]._id %>">
+            <td><%= product[i].productName %></td>
+            <td><%= product[i].description %></td>
+            <td><%= product[i].category.name %></td>
+            <td><%= product[i].quantity %></td>
+            <td><%= product[i].regularPrice %></td>
+            <td><%= product[i].salePrice %></td>
+            <td><%= new Date(product[i].createdAt).toLocaleString('en-US') %></td>
+            
+            <td>
+              <button class="btn btn-secondary" style="width: 80px">
+                <a href="/admin/edit-product?id=<%= product[i]._id %>" class="text-white" style="text-decoration: none"
+                  >Edit</a
+                >
+              </button>
+              </td>
+              <td>
+                <button class="btn btn-danger" style="width: 80px" onclick="confirmDelete('<%= product[i]._id %>')">
+                  Delete
+                </button>
+              </td>
+              
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="container mt-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+        <div>
+            <button class="btn btn-dark" style="width: 150px; margin-bottom: 20px;">
+                <a href="/admin/add-product" class="text-white" style="text-decoration: none"
+                  >Add Product</a
+                >
+              </button>
+        </div>
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+
+  function confirmDelete(productId) {
+  // Show SweetAlert confirmation popup
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will not be able to recover this product!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Perform AJAX request to delete the category
+      $.ajax({
+        type: 'DELETE',
+        url: `/admin/delete-product/${productId}`,
+        success: function(response) {
+          if (response.message === 'Product soft deleted successfully') {
+            // Show success message with SweetAlert
+            Swal.fire({
+              icon: 'success',
+              title: 'Product deleted!',
+              text: 'The product is successfully deleted.',
+              showConfirmButton: false,
+              timer: 1500
+            });
+
+            // Find and remove the row from the table
+            const row = document.getElementById(productId); // Get the row by category ID
+            row.remove(); // Remove the row from the table
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete the product. Please try again later.'
+            });
+          }
+        },
+        error: function() {
+          Swal.fire({
+            icon: 'error',
+            title: 'Request Failed',
+            text: 'An error occurred while deleting the product. Please try again.'
+          });
+        }
+      });
+    }
+  });
+}
+
+
+  </script>
+  

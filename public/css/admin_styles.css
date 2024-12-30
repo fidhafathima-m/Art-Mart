@@ -552,6 +552,24 @@ ol {
 	display: none;
 }
 
+#imagePreview {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+  }
+  
+  #imagePreview .image-container {
+	display: inline-block;
+	margin-top: 10px;
+  }
+  
+  #imagePreview img {
+	width: 150px;
+	cursor: pointer;
+	border-radius: 5px;
+  }
+  
+
 .search-form {
     display: flex;
     align-items: center;

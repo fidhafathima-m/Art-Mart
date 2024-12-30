@@ -12,7 +12,7 @@ const productSchema = new Schema({
     },
     brand: {
         type: String,
-        required: true
+        required: false
     },
     category: {
         type: Schema.Types.ObjectId,
@@ -42,6 +42,10 @@ const productSchema = new Schema({
     isBlocked: {
         type: Boolean,
         default: false
+    },
+    isListed: {
+        type: Boolean,
+        default: true
     },
     status: {
         type: String,

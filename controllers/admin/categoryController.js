@@ -48,10 +48,11 @@ const getListCategory = async (req, res) => {
     try {
         let id = req.query.id;
         await Category.updateOne({_id: id}, {$set: {isListed: false}});
-        res.redirect('/admin/categories');
+        // Send success response for AJAX
+        res.json({ success: true });
     } catch (error) {
         console.error(error);
-        res.redirect('/admin/pageError');
+        res.json({ success: false, message: 'Error unlisting category' });
     }
 }
 
@@ -59,12 +60,14 @@ const getUnlistCategory = async (req, res) => {
     try {
         let id = req.query.id;
         await Category.updateOne({_id: id}, {$set: {isListed: true}});
-        res.redirect('/admin/categories');
+        // Send success response for AJAX
+        res.json({ success: true });
     } catch (error) {
         console.error(error);
-        res.redirect('/admin/pageError');
+        res.json({ success: false, message: 'Error listing category' });
     }
 }
+
 
 const loadAddCategory = async (req, res) => {
     try {
@@ -141,54 +144,56 @@ const loadEditCategory = async (req, res) => {
 const editCategory = async (req, res) => {
     try {
         const id = req.params.id;
-
         const { categoryName, description } = req.body;
 
         const existingCategory = await Category.findById(id);
         if (!existingCategory) {
-            return res.status(404).json({error: 'Category not found'});
+            return res.status(404).json({ success: false, message: 'Category not found' });
         }
 
-        const updateCategory = await Category.findByIdAndUpdate(
-            id, 
+        const updatedCategory = await Category.findByIdAndUpdate(
+            id,
             { name: categoryName, description: description },
-            { new: true } 
+            { new: true }
         );
 
-        if (updateCategory) {
-            return res.redirect('/admin/categories');  
+        if (updatedCategory) {
+            return res.status(200).json({ success: true, message: 'Category updated successfully!' });
         } else {
-            return res.status(404).json({error: 'Category not found after update'});
+            return res.status(500).json({ success: false, message: 'Failed to update category' });
         }
 
     } catch (error) {
-        console.error(error); 
-        return res.status(500).json({error: 'Internal Server Error'});
+        console.log(error.message);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
     }
 };
 
+
+
 const deleteCategory = async (req, res) => {
     try {
-        const { id } = req.params; // Get the category ID from the URL
-    
-        // Soft delete by setting 'deleted' to true
-        const category = await Category.findByIdAndUpdate(
-            id, { 
-                isListed: false,
-                isDeleted: true,
-            }, { new: true }
-        );
-    
-        if (!category) {
-          return res.status(404).json({ error: 'Category not found' });
-        }
-    
-        res.status(200).json({ message: 'Category soft deleted successfully' });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+      const { id } = req.params; // Get the category ID from the URL
+  
+      // Soft delete by setting 'isListed' to false and 'isDeleted' to true
+      const category = await Category.findByIdAndUpdate(
+        id, { 
+          isListed: false,
+          isDeleted: true,
+        }, { new: true }
+      );
+  
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found' });
       }
-};
+  
+      res.status(200).json({ message: 'Category soft deleted successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+  
 
 
 
