@@ -1,4 +1,6 @@
 const User = require('../../models/userSchema');
+const Product = require('../../models/productSchema');
+const Category = require('../../models/categorySchema');
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const env = require('dotenv').config();
@@ -61,26 +63,41 @@ const pageNotFound = async (req, res) => {
 
 const loadHomePage = async (req, res) => {
     try {
-        const user = req.session.user; 
+        const user = req.session.user;
+        const categories = await Category.find({ isListed: true });
 
-        if (user) {
-            const userData = await User.findOne({ _id: user });
-
-            if (userData) {
-                res.locals.user = userData;
-                res.render('home', { user: userData });
-            } else {
-                console.log('No user found with that ID');
-                res.render('home');
+        let productsData = await Product.find(
+            {
+                isBlocked: false,
+                category: { $in: categories.map(category => category._id) },
+                quantity: { $gt: 0 }
             }
+        ).select('productName productImage salePrice createdAt');  // Optimize fields
+
+        // Sort products and limit to 4
+        productsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        productsData = productsData.slice(0, 4);
+
+        if (productsData.length === 0) {
+            console.log('No products found');
+            return res.render('home', { user: req.session.user, product: [], message: 'No products available at the moment' });
+        }
+
+        const userData = user ? await User.findOne({ _id: user }) : null;
+
+        if (userData) {
+            res.locals.user = userData;
+            res.render('home', { user: userData, product: productsData });
         } else {
-            res.render('home');
+            console.log('No user found with that ID');
+            res.render('home', { product: productsData });
         }
     } catch (error) {
-        console.log('Error loading home page', error);
-        res.status(500).send('Internal Server Error: Unable to load home page.');
+        console.log('Error loading home page', error.message);
+        res.status(500).send(`Internal Server Error: Unable to load home page. Error: ${error.message}`);
     }
 };
+
 
 const loadSignUp = async (req, res) => {
     try {
@@ -93,10 +110,19 @@ const loadSignUp = async (req, res) => {
 
 const loadShopping = async (req, res) => {
     try {
-        res.render('shop');
+        
+        // Fetch categories and products
+        const categories = await Category.find({isListed: true, isDeleted: false});
+        const products = await Product.find({ isBlocked: false, quantity: { $gt: 0 } }).limit(10);  // Fetch some products
+
+        // Render the shopping page with categories and products
+        res.render('shop', {
+            categories: categories,
+            products: products
+        });
     } catch (error) {
-        console.log('Error loading shopping page', error);
-        res.status(500).send('Internal Server Error: Unable to load shopping page.');
+        console.log('Error fetching data:', error);
+        res.status(500).send('Internal Server Error');
     }
 }
 

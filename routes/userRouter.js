@@ -27,7 +27,7 @@ router.get('/auth/google/callback',userAuth.isLogout, passport.authenticate('goo
 router.get('/login',userAuth.isLogout, userController.loadLogin);
 router.post('/login', userController.login);
 
-router.get('/shop',userAuth.isLogin, userController.loadShopping);
+router.get('/shop', userController.loadShopping);
 
 router.get('/logout', userController.logout);
 

@@ -26,6 +26,7 @@
             <th>Regular Price</th>
             <th>Sale Price</th>
             <th>Added On</th>
+            <th>Block/Unblock</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -39,6 +40,18 @@
             <td><%= product[i].regularPrice %></td>
             <td><%= product[i].salePrice %></td>
             <td><%= new Date(product[i].createdAt).toLocaleString('en-US') %></td>
+
+            <td>
+              <% if (product[i].isBlocked === false) { %>
+              <button class="btn btn-warning block-btn" data-id="<%= product[i]._id %>" style="width: 80px">
+                Block
+              </button>
+              <% } else { %>
+              <button class="btn btn-success unblock-btn" data-id="<%= product[i]._id %>" style="width: 80px">
+                Unblock
+              </button>
+              <% } %>
+            </td>
             
             <td>
               <button class="btn btn-secondary" style="width: 80px">
@@ -89,6 +102,112 @@
 
 
 <script>
+
+  // Block Product with Confirmation
+  $(document).on('click', '.block-btn', function() {
+        var productId = $(this).data('id');
+        
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You are about to block this product!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Block!',
+            cancelButtonText: 'No, Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If confirmed, make AJAX request to block the product
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/block-product',
+                    data: { id: productId },
+                    success: function(response) {
+                        if(response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Product Blocked Successfully',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload(); // Reload the page to update the UI
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while blocking the product. Please try again.'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Request Failed',
+                            text: 'There was an issue connecting to the server. Please try again.'
+                        });
+                    }
+                });
+            } else {
+                // If the user clicks Cancel
+                Swal.fire('Cancelled', 'Product blocking was cancelled.', 'info');
+            }
+        });
+    });
+
+    // Unblock Product with Confirmation
+    $(document).on('click', '.unblock-btn', function() {
+        var productId = $(this).data('id');
+        
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You are about to unblock this product!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Unblock!',
+            cancelButtonText: 'No, Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If confirmed, make AJAX request to unblock the product
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/unblock-product',
+                    data: { id: productId },
+                    success: function(response) {
+                        if(response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Product Unblocked Successfully',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload(); // Reload the page to update the UI
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while unblocking the product. Please try again.'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Request Failed',
+                            text: 'There was an issue connecting to the server. Please try again.'
+                        });
+                    }
+                });
+            } else {
+                // If the user clicks Cancel
+                Swal.fire('Cancelled', 'Product unblocking was cancelled.', 'info');
+            }
+        });
+    });
 
   function confirmDelete(productId) {
   // Show SweetAlert confirmation popup

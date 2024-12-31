@@ -217,4 +217,44 @@ handleImageUpload('image1', 'image1-preview', 'saveImage1', 'croppedImage1', 'cr
 handleImageUpload('image2', 'image2-preview', 'saveImage2', 'croppedImage2', 'croppedImage2Data');
 handleImageUpload('image3', 'image3-preview', 'saveImage3', 'croppedImage3', 'croppedImage3Data');
 
+$('#productForm').on('submit', function(e) {
+    e.preventDefault(); // Prevent normal form submission
+
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'), // Form action URL
+        data: new FormData(this), // Send the form data including files
+        processData: false,  // Don't process the data
+        contentType: false,  // Don't set content type
+        success: function(response) {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product Added',
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    // Redirect to products page after the alert
+                    window.location.href = '/admin/products'; // Replace with your products page URL
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message || 'There was an error adding the product.'
+                });
+            }
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Request Failed',
+                text: 'There was an issue connecting to the server. Please try again.'
+            });
+        }
+    });
+});
+
+
 </script>

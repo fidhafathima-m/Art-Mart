@@ -1001,6 +1001,7 @@ ol {
 }
 
 .filter__controls {
+	padding-top: 20px;
 	text-align: center;
 	margin-bottom: 45px;
 }
@@ -1064,6 +1065,10 @@ ol {
 	height: 260px;
 	position: relative;
 	background-position: center center;
+}
+.default-img {
+	width: 240px;
+	height: 240px;
 }
 
 .product__item__pic .label {
@@ -1177,6 +1182,7 @@ ol {
 }
 
 .product__item__text h5 {
+	text-align: left;
 	color: #0d0d0d;
 	font-weight: 700;
 }
@@ -1289,10 +1295,13 @@ ol {
 	height: 100%;
 }
 
+
+
 .shop__sidebar__accordion .card {
 	border: none;
 	border-radius: 0;
 	margin-bottom: 25px;
+	padding: 10px 20px;
 }
 
 .shop__sidebar__accordion .card:last-child {
@@ -1585,6 +1594,83 @@ ol {
 	padding-right: 15px;
 }
 
+/* Make the wishlist button visible */
+.wishlist-btn {
+    font-size: 18px;
+    color: #fff;
+    background-color: #538efd;
+    padding: 10px;
+    border-radius: 100%;
+    transition: background-color 0.3s;
+}
+
+.wishlist-btn:hover {
+    background-color: #1064ff;
+}
+
+/* Flexbox layout to align product title and wishlist button */
+.product-title-container {
+	padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Position the wishlist button to the right */
+.wishlist-btn-right {
+    font-size: 18px;
+    color: #397eff;
+    margin-left: 10px;
+}
+
+/* Optional: style the wishlist button container for better layout */
+.wishlist-btn-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Optional: Add some space to product content */
+.product-content-wrap {
+    padding: 15px;
+}
+
+/* Add to Cart button styling */
+.add-to-cart-btn {
+    display: inline-block;
+    padding: 10px 0px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #5b5b5b; /* Dark text color */
+    text-transform: uppercase;
+    text-decoration: none;
+    position: relative;
+    border: none;
+}
+
+.add-to-cart-btn::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50%; /* Initially 50% width */
+    height: 2px; /* Border thickness */
+    background-color: #397eff; /* Border color */
+    transition: width 0.3s ease; /* Smooth transition for width change */
+}
+
+.add-to-cart-btn:hover::after {
+    width: 100%; /* Full width of the button on hover */
+}
+.add-to-cart-btn:hover {
+    color: #1a1a1a !important; /* Make sure the text stays black */
+}
+
+.add-to-cart-btn:focus {
+    outline: none;
+}
+
+
 /*---------------------
   Shop
 -----------------------*/
@@ -1627,6 +1713,7 @@ ol {
 	-ms-flex-pack: center;
 	justify-content: center;
 }
+
 
 .product__details__pic .nav-tabs .nav-item .nav-link .product__thumb__pic i {
 	height: 56px;
@@ -2163,38 +2250,54 @@ ol {
   Breadcrumb
 -----------------------*/
 
+.shop_title h3, h5 {
+	color: white;
+	text-align: center;
+}
+
+.shop_title h3 {
+	font-size: 3rem;
+	padding-top: 30px;
+	padding-bottom: 10px;
+}
+
 .breadcrumb-option {
-	background: #f3f2ee;
-	padding: 40px 0;
+    background: url('/img/shop-details//background_shop.jpg') no-repeat center center; /* Add background image */
+    background-size: cover; /* Make sure the background covers the entire section */
+    padding: 40px 0; /* Keep the padding as you had */
+    color: white; /* Ensures text color contrasts against the background */
+	height: 300px;
 }
 
 .breadcrumb__text h4 {
-	color: #111111;
-	font-weight: 700;
-	margin-bottom: 8px;
+    color: #ffffff; /* Change text color to white for visibility on dark background */
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
 .breadcrumb__links a {
-	font-size: 15px;
-	color: #111111;
-	margin-right: 18px;
-	display: inline-block;
-	position: relative;
+    font-size: 15px;
+    color: #ffffff; /* White color for links */
+    margin-right: 18px;
+    display: inline-block;
+    position: relative;
+	padding-top: 20px;
 }
 
 .breadcrumb__links a:after {
-	position: absolute;
-	right: -14px;
-	top: 0;
-	content: "";
-	font-family: "FontAwesome";
+    position: absolute;
+    right: -14px;
+    top: 20px;
+    content: "";
+    font-family: "FontAwesome";
 }
 
 .breadcrumb__links span {
-	font-size: 15px;
-	color: #b7b7b7;
-	display: inline-block;
+    font-size: 15px;
+    color: #b7b7b7; /* Slightly lighter color for the span */
+    display: inline-block;
 }
+
 
 /*---------------------
   Breadcrumb Blog

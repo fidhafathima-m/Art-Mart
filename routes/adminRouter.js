@@ -73,6 +73,10 @@ router.get('/products', adminAuth.isLogin,  productController.productInfo);
 router.get('/add-product', adminAuth.isLogin,  productController.loadAddProduct);
 router.post('/add-product', adminAuth.isLogin,upload.array("images", 3),  productController.addProduct);
 router.get('/edit-product', adminAuth.isLogin,  productController.loadEditProduct);
+router.post('/edit-product/:id', adminAuth.isLogin, upload.array("images", 3),  productController.editProduct);
+router.post('/deleteImage', adminAuth.isLogin, productController.deleteSingleImage);
+router.post('/block-product', adminAuth.isLogin, productController.blockProduct);
+router.post('/unblock-product', adminAuth.isLogin, productController.unblockProduct);
 router.delete('/delete-product/:id',  productController.deleteProduct);
 
 
