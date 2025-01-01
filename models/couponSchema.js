@@ -17,7 +17,7 @@ const couponSchema = new Schema({
         required: true,
     },
     offerPrice: {
-        type: number,
+        type: Number,
         required: true
     },
     minPurchaseAmount: {

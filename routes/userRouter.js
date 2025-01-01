@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user/userController');
 const profileController = require('../controllers/user/profileController');
+const productController = require('../controllers/user/productController');
 const userAuth = require('../middlewares/auth');
 const passport = require('passport');
 
@@ -27,7 +28,11 @@ router.get('/auth/google/callback',userAuth.isLogout, passport.authenticate('goo
 router.get('/login',userAuth.isLogout, userController.loadLogin);
 router.post('/login', userController.login);
 
+// Shopping page
 router.get('/shop', userController.loadShopping);
+router.get('/filter', userController.filterProduct);
+router.get('/filterPrice', userController.filterByPrice);
+router.get('/search', userController.searchProducts);
 
 router.get('/logout', userController.logout);
 
@@ -39,5 +44,7 @@ router.post('/resend-forgot-otp', profileController.resendForgetPassOtp);
 router.get('/reset-password',userAuth.isLogout, profileController.resetPasswordLoad);
 router.post('/reset-password', profileController.resetPassword);
 
+// Product Managemrnt
+router.get('/product-details', productController.loadProductDetails);
 
 module.exports = router;

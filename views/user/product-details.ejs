@@ -1,0 +1,181 @@
+<%- include('../../views/partials/user/header') %>
+
+
+<div class="container my-5">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= products.productName%></li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image Section -->
+        <div class="col-md-6">
+            <div class="product-image">
+                <!-- Big Image with Zoom -->
+                <div class="main-img-container position-relative">
+                    <img src="<%= products.productImage[0] %>" 
+                        class="img-fluid main-image" 
+                        id="main-image" 
+                        alt="<%= products.productName %>">
+                    <div class="magnifier-lens"></div>
+                </div>
+
+
+                <!-- Thumbnail Images -->
+                <div class="thumbnails mt-3">
+                    <div class="row">
+                        <% if (products.productImage && products.productImage.length > 0) { %>
+                        <% products.productImage.forEach((image, index) => { %>
+                            <div class="col-3">
+                                <img src="<%= image %>" class="img-fluid thumbnail" alt="Thumbnail" data-target="#main-image" data-image="<%= image %>">
+                            </div>
+                        <% }) %>
+                        <% } else { %>
+                            <p>No product images available</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Info Section -->
+        <div class="col-md-6 product-details">
+            <div class="magnified-image"></div>
+            <h2><%= products.productName %></h2>
+
+            <!-- Static Rating -->
+            <div class="product-rating mb-3">
+                <span>★★★★☆</span> <!-- Static Rating (This could be dynamic if you want) -->
+            </div>
+
+            <!-- Price -->
+            <hr>
+            <div class="product-price">
+                <span class="h3 text-primary">&#8377 <%= products.salePrice %></span>
+                <span class="h5 text-muted ml-2"><s>&#8377 <%= products.regularPrice %></s></span>
+            </div>
+
+            <!-- Product Description -->
+            <hr>
+            <p><%= products.description %></p>
+
+            <!-- Product Policies -->
+            <div class="product-policies">
+                <p><i class="bi bi-gear"></i> 1 Year Warranty</p>
+                <p><i class="bi bi-arrow-clockwise"></i> 30 Days Return Policy</p>
+                <p><i class="bi bi-truck"></i> Cash on Delivery</p>
+            </div>
+
+            
+
+            <!-- Quantity Control -->
+            <div class="quantity-control d-flex align-items-center mb-4">
+                <button class="btn btn-light" id="decrease-quantity"><i class="bi bi-dash"></i></button>
+                <input type="text" id="quantity" class="form-control mx-2" value="1" readonly style="width: 60px; text-align: center;">
+                <button class="btn btn-light" id="increase-quantity"><i class="bi bi-plus"></i></button>
+            </div>
+
+            <!-- Add to Cart and Wishlist -->
+            <div class="d-flex">
+                <button class="btn btn-primary mr-2" id="add-to-cart">Add to Cart</button>
+                <button class="btn btn-outline-danger" id="add-to-wishlist"><i class="bi bi-heart"></i> Add to Wishlist</button>
+            </div>
+
+             
+
+            <!-- Tags and Availability -->
+            <hr>
+            <div class="product-tags">
+                <p><strong>Category:</strong> <%= products.category.name %></p>
+                <p><strong>Availability:</strong> <%= products.quantity %> Items in Stock</p>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="coupon-section">
+                <h4>Available Coupons:</h4>
+                <ul>
+                <% coupons.forEach(coupon => { %>
+                    <li>
+                    <b><%= coupon.name %></b>: 
+                    <% if (coupon.expireOn > Date.now()) { %>
+                        <span>Valid Until: <%= coupon.expireOn.toLocaleDateString() %></span>
+                    <% } else { %>
+                        <span>Expired</span>
+                    <% } %>
+                    </li>
+                <% }) %>
+                </ul>
+
+                <!-- Coupon Input Field -->
+                <!-- <h4>Apply Coupon:</h4>
+                <form id="applyCouponForm">
+                <input type="text" id="couponCode" name="couponCode" placeholder="Enter Coupon Code" required />
+                <button type="submit">Apply Coupon</button> -->
+                </form>
+
+                <!-- <div id="couponFeedback"></div>
+                <h3>Total Price: $<span id="totalPrice"><%= products.salePrice %></span></h3>
+            </div> -->
+            </div>
+
+            
+        </div>
+    </div>
+</div>
+
+<%- include('../../views/partials/user/footer') %>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.rawgit.com/jackmoore/zoom.js/master/dist/zoom.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script>
+    // Change main image on thumbnail click
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.addEventListener('click', (e) => {
+            const mainImage = document.getElementById('main-image');
+            const newImageSrc = e.target.getAttribute('data-image');
+            mainImage.src = newImageSrc;
+            mainImage.setAttribute('data-zoom-image', newImageSrc); // Update the zoom image as well
+        });
+    });
+
+  document.addEventListener('DOMContentLoaded', function() {
+      // Dynamically set availableQuantity to product quantity passed from the backend
+      let availableQuantity = '<%= quantity %>';
+
+      const decreaseBtn = document.getElementById('decrease-quantity');
+      const increaseBtn = document.getElementById('increase-quantity');
+      const quantityInput = document.getElementById('quantity');
+
+      // Initialize quantity input to 1 (minimum quantity)
+      quantityInput.value = 1;
+
+      // Decrease quantity functionality
+      decreaseBtn.addEventListener('click', function() {
+          let currentQuantity = parseInt(quantityInput.value);
+
+          // Decrease only if the current quantity is greater than 1
+          if (currentQuantity > 1) {
+              quantityInput.value = currentQuantity - 1;
+          }
+      });
+
+      // Increase quantity functionality
+      increaseBtn.addEventListener('click', function() {
+          let currentQuantity = parseInt(quantityInput.value);
+
+          // Increase only if the current quantity is less than available stock
+          if (currentQuantity < availableQuantity) {
+              quantityInput.value = currentQuantity + 1;
+          }
+      });
+  });
+
+</script>

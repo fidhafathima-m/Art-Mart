@@ -10,30 +10,28 @@ const categoryInfo = async (req, res) => {
         const skip = (page - 1) * limit;
 
         // Construct a filter object that will search based on the category name
-        const searchQuery = {
-            isDeleted: { $ne: true }
-        };
+        const searchQuery = {};
 
         if (search) {
-            // Modify the query to include a search condition for category name
+            // Modify the query to include a search condition for product name
             searchQuery.name = { $regex: '.*' + search + '.*', $options: 'i' };  // 'i' makes it case-insensitive
         }
 
-        // Fetch categories with the applied search filter
+        // Fetch all products (including soft-deleted) and populate categories
         const categoryData = await Category.find(searchQuery)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
-        // Count the total categories matching the search criteria
-        const totalCategories = await Category.countDocuments(searchQuery);
-        const totalPages = Math.ceil(totalCategories / limit);
+        // Count the total products matching the search criteria for pagination
+        const totalCategory = await Category.countDocuments(searchQuery);
+        const totalPages = Math.ceil(totalCategory / limit);
 
-        // Render the categories page with the search results
+        // Render the products page with all products, including soft-deleted
         res.render('categories', {
             category: categoryData,
             currentPage: page,
-            totalCategories: totalCategories,
+            totalCategory: totalCategory,
             totalPages: totalPages,
             search: search // Pass the search term to the view to keep it in the input box
         });
@@ -43,6 +41,7 @@ const categoryInfo = async (req, res) => {
         res.redirect('/admin/pageError');
     }
 };
+
 
 const getListCategory = async (req, res) => {
     try {
@@ -172,28 +171,48 @@ const editCategory = async (req, res) => {
 
 
 const deleteCategory = async (req, res) => {
+    const { id } = req.params;
+
     try {
-      const { id } = req.params; // Get the category ID from the URL
-  
-      // Soft delete by setting 'isListed' to false and 'isDeleted' to true
-      const category = await Category.findByIdAndUpdate(
-        id, { 
-          isListed: false,
-          isDeleted: true,
-        }, { new: true }
-      );
-  
-      if (!category) {
-        return res.status(404).json({ error: 'Category not found' });
-      }
-  
-      res.status(200).json({ message: 'Category soft deleted successfully' });
+        // Soft delete the product by setting 'isDeleted' to true and updating the 'deletedAt' timestamp
+        const category = await Category.findByIdAndUpdate(
+            id,
+            { isDeleted: true, deletedAt: new Date(), isListed: false },
+            { new: true }
+        );
+
+        // Respond with success if the product was found and updated
+        if (category) {
+            res.json({ message: 'Category soft deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Category not found' });
+        }
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ message: 'Error deleting category', error });
     }
   };
-  
+
+  const restoreCategory = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Restore the product by setting 'isDeleted' to false and clearing 'deletedAt'
+        const category = await Category.findByIdAndUpdate(
+            id,
+            { isDeleted: false, deletedAt: null, isListed: true },
+            { new: true }
+        );
+
+        // Respond with success if the product was found and updated
+        if (category) {
+            res.json({ message: 'Category restored successfully' });
+        } else {
+            res.status(404).json({ message: 'Category not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error restoring category', error });
+    }
+  }
 
 
 
@@ -206,4 +225,5 @@ module.exports = {
     loadEditCategory,
     editCategory,
     deleteCategory,
+    restoreCategory
 }

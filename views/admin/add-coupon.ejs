@@ -1,0 +1,112 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container">
+    <h1 class="my-4">Add New Coupon</h1>
+
+    <!-- Form to Add Coupon -->
+    <form id="addCouponForm" method="POST" enctype="multipart/form-data">
+      <div class="form-group mb-3">
+        <label for="name">Coupon Name</label>
+        <input type="text" class="form-control" id="name" name="name" required placeholder="Enter coupon name">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="expireOn">Expiration Date</label>
+        <input type="datetime-local" class="form-control" id="expireOn" name="expireOn" required>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="offerPrice">Offer Price</label>
+        <input type="number" class="form-control" id="offerPrice" name="offerPrice" required min="0" placeholder="Enter offer price">
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="minPurchaseAmount">Minimum Purchase Amount</label>
+        <input type="number" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount" required min="0" placeholder="Enter minimum purchase amount">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Add Coupon</button>
+    <a href="/admin/coupons" class="btn btn-danger">Cancel</a>
+
+    </form>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  // AJAX form submission with SweetAlert
+  $('#addCouponForm').submit(function (e) {
+    e.preventDefault();  // Prevent form submission to handle via AJAX
+
+    // Get the form data
+    var formData = {
+      name: $('#name').val(),
+      expireOn: $('#expireOn').val(),
+      offerPrice: $('#offerPrice').val(),
+      minPurchaseAmount: $('#minPurchaseAmount').val(),
+    };
+
+    // Basic Validation
+    if (!formData.name || !formData.expireOn || !formData.offerPrice || !formData.minPurchaseAmount) {
+      Swal.fire({
+        icon: 'error',
+        title: 'All fields are required!',
+        text: 'Please fill in all the fields.',
+      });
+      return;
+    }
+
+    // Validate the expiration date (ensure it's a valid date)
+    var expireDate = new Date(formData.expireOn);
+    if (isNaN(expireDate)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid expiration date',
+        text: 'Please enter a valid expiration date.',
+      });
+      return;
+    }
+
+    // Send AJAX POST request
+    $.ajax({
+      type: 'POST',
+      url: '/admin/add-coupon',  // Your backend route
+      data: formData,
+      success: function (response) {
+        if (response.success) {
+          // Display success message using SweetAlert
+          Swal.fire({
+            icon: 'success',
+            title: 'Coupon Added',
+            text: response.message || 'The coupon has been added successfully.',
+          }).then(() => {
+            // Redirect to manage coupons page after success
+            window.location.href = '/admin/coupons';
+          });
+        } else {
+          // Handle failure and show error message
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.message || 'There was an issue adding the coupon.',
+          });
+        }
+      },
+      error: function () {
+        // Handle AJAX error
+        Swal.fire({
+          icon: 'error',
+          title: 'Server Error',
+          text: 'There was an issue connecting to the server.',
+        });
+      }
+    });
+  });
+</script>

@@ -29,7 +29,7 @@
                 <div class="shop__sidebar">
                     <div class="shop__sidebar__search">
                         <!-- Search Bar -->
-                        <form method="GET">
+                        <form method="GET" action="/search">
                             <div class="input-group mb-3">
                             <input type="text" class="form-control" name="search" placeholder="Search ..." aria-label="Search" aria-describedby="basic-addon2">
                             <button type="submit"><span class="icon_search"></span></button>
@@ -47,7 +47,7 @@
                                         <div class="shop__sidebar__categories">
                                             <ul class="nice-scroll">
                                                 <% for (let i = 0; i < categories.length; i++) { %>
-                                                <li><a href="#"><%= categories[i].name %></a></li>
+                                                <li><a href="/filter?category=<%= categories[i]._id %>"><%= categories[i].name %></a></li>
                                                 <% } %>
                                             </ul>
                                         </div>
@@ -79,10 +79,10 @@
                                     <div class="card-body">
                                         <div class="shop__sidebar__price">
                                             <ul>
-                                                <li><a href="#">&#8377 100.00 - &#8377 500.00</a></li>
-                                                <li><a href="#">&#8377 500.00 - &#8377 1000.00</a></li>
-                                                <li><a href="#">&#8377 1000.00 - &#8377 2000.00</a></li>
-                                                <li><a href="#">&#8377 2000.00+</a></li>
+                                                <li><a href="/filterPrice?gt=0&lt=500">Under &#8377 500.00</a></li>
+                                                <li><a href="/filterPrice?gt=500&lt=1000">&#8377 500.00 - &#8377 1000.00</a></li>
+                                                <li><a href="/filterPrice?gt=1000&lt=1500">&#8377 1000.00 - &#8377 1500.00</a></li>
+                                                <li><a href="/filterPrice?gt=1500&lt=100000">&#8377 1500.00+</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -184,7 +184,7 @@
                 </div>
             </div>
             <div class="col-lg-9">
-                <div class="shop__product__option">
+                <!-- <div class="shop__product__option">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="shop__product__option__left">
@@ -202,7 +202,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="row">
                     <% for (let i = 0; i < products.length; i++) { %>
                     <div class="col-lg-4 col-md-6 col-sm-6">
@@ -231,7 +231,8 @@
                                         <i class="fa fa-star-o"></i>
                                         <i class="fa fa-star-o"></i>
                                     </div> -->
-                                    <h5>&#8377 <%= products[i].salePrice %></h5>
+                                    <h5>&#8377 <%= products[i].salePrice.toLocaleString('en-IN') %></h5>
+                                    <span class="text-muted"><strike>&#8377 <%= products[i].regularPrice.toLocaleString('en-IN') %></strike></span>
                                 
                             </div>
                         </div>
@@ -242,19 +243,19 @@
             </div>
                     
         </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="product__pagination">
-                            <a class="active" href="#">1</a>
-                            <a href="#">2</a>
-                            <a href="#">3</a>
-                            <span>...</span>
-                            <a href="#">21</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+        <!-- Pagination -->
+      <div class="container mt-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+
     </div>
 </section>
 <%- include('../../views/partials/user/footer') %>

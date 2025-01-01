@@ -8,6 +8,7 @@ const adminAuth = require('../middlewares/adminAuth');
 const customerController = require("../controllers/admin/customerController");
 const categoryController = require('../controllers/admin/categoryController');
 const productController = require('../controllers/admin/productController');
+const couponController = require('../controllers/admin/couponController');
 
 router.get("/pageError", adminController.pageError);
 router.get("/login", adminAuth.isLogout, adminController.loadLogin);
@@ -39,7 +40,8 @@ router.get('/add-category', adminAuth.isLogin,  categoryController.loadAddCatego
 router.post('/add-category',  categoryController.addCategory);
 router.get('/edit-category', adminAuth.isLogin,  categoryController.loadEditCategory);
 router.post('/edit-category/:id',  categoryController.editCategory);
-router.delete('/delete-category/:id',  categoryController.deleteCategory);
+router.patch('/delete-category/:id',  categoryController.deleteCategory);
+router.patch('/restore-category/:id',  categoryController.restoreCategory);
 
 //Product Management
 
@@ -57,7 +59,7 @@ const storage = multer.diskStorage({
 // Initialize multer with the storage configuration
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit to 5 MB
+    limits: { fileSize: 20 * 1024 * 1024, fieldSize: 50 * 1024 * 1024,  }, 
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/')) {
             cb(null, true);
@@ -77,8 +79,16 @@ router.post('/edit-product/:id', adminAuth.isLogin, upload.array("images", 3),  
 router.post('/deleteImage', adminAuth.isLogin, productController.deleteSingleImage);
 router.post('/block-product', adminAuth.isLogin, productController.blockProduct);
 router.post('/unblock-product', adminAuth.isLogin, productController.unblockProduct);
-router.delete('/delete-product/:id',  productController.deleteProduct);
+router.patch('/delete-product/:id',  productController.deleteProduct);
+router.patch('/restore-product/:id',  productController.restoreProduct);
 
-
+// Coupon Management
+router.get('/coupons', adminAuth.isLogin, couponController.loadCoupon);
+router.get('/add-coupon', adminAuth.isLogin, couponController.LoadAddCoupon);
+router.post('/add-coupon', adminAuth.isLogin, couponController.addCoupon);
+router.get('/listCoupon', adminAuth.isLogin, couponController.listCoupon);
+router.get('/unlistCoupon', adminAuth.isLogin, couponController.unlistCoupon);
+router.get('/edit-coupon', adminAuth.isLogin, couponController.loadEditCoupon)
+router.post('/edit-coupon/:id', adminAuth.isLogin, couponController.editCoupon)
 
 module.exports = router;

@@ -16,27 +16,25 @@ const productInfo = async (req, res) => {
         const skip = (page - 1) * limit;
 
         // Construct a filter object that will search based on the category name
-        const searchQuery = {
-            isDeleted: { $ne: true },
-        };
+        const searchQuery = {};
 
         if (search) {
-            // Modify the query to include a search condition for category name
+            // Modify the query to include a search condition for product name
             searchQuery.productName = { $regex: '.*' + search + '.*', $options: 'i' };  // 'i' makes it case-insensitive
         }
 
-        // Fetch categories with the applied search filter
+        // Fetch all products (including soft-deleted) and populate categories
         const productData = await Product.find(searchQuery)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
             .populate('category', 'name');
 
-        // Count the total categories matching the search criteria
+        // Count the total products matching the search criteria for pagination
         const totalProducts = await Product.countDocuments(searchQuery);
         const totalPages = Math.ceil(totalProducts / limit);
 
-        // Render the categories page with the search results
+        // Render the products page with all products, including soft-deleted
         res.render('products', {
             product: productData,
             currentPage: page,
@@ -50,6 +48,7 @@ const productInfo = async (req, res) => {
         res.redirect('/admin/pageError');
     }
 };
+
 
 
 
@@ -165,27 +164,48 @@ const loadEditProduct = async (req, res) => {
 
 
 const deleteProduct = async (req, res) => {
+    const { id } = req.params;
+
     try {
-      const { id } = req.params; // Get the category ID from the URL
-  
-      // Soft delete by setting 'isListed' to false and 'isDeleted' to true
-      const product = await Product.findByIdAndUpdate(
-        id, { 
-          isListed: false,
-          isDeleted: true,
-        }, { new: true }
-      );
-  
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-  
-      res.status(200).json({ message: 'Product soft deleted successfully' });
+        // Soft delete the product by setting 'isDeleted' to true and updating the 'deletedAt' timestamp
+        const product = await Product.findByIdAndUpdate(
+            id,
+            { isDeleted: true, deletedAt: new Date() },
+            { new: true }
+        );
+
+        // Respond with success if the product was found and updated
+        if (product) {
+            res.json({ message: 'Product soft deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ message: 'Error deleting product', error });
     }
   };
+
+  const restoreProduct = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Restore the product by setting 'isDeleted' to false and clearing 'deletedAt'
+        const product = await Product.findByIdAndUpdate(
+            id,
+            { isDeleted: false, deletedAt: null },
+            { new: true }
+        );
+
+        // Respond with success if the product was found and updated
+        if (product) {
+            res.json({ message: 'Product restored successfully' });
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error restoring product', error });
+    }
+  }
   
   const editProduct = async (req, res) => {
     try {
@@ -343,4 +363,5 @@ module.exports = {
     blockProduct,
     unblockProduct,
     deleteProduct,
+    restoreProduct,
 }

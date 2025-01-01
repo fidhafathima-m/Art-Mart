@@ -134,7 +134,8 @@
     <input type="hidden" id="croppedImage2Data" name="croppedImage2">
     <input type="hidden" id="croppedImage3Data" name="croppedImage3">
                                    
-            <button type="submit" class="btn btn-primary">Update Product</button>
+            <button type="submit" class="btn btn-primary mb-3">Update Product</button>
+            <a href="/admin/products" class="btn btn-danger mb-3">Cancel</a>
         </form>
     </div>
 </div>
@@ -215,21 +216,35 @@
             reader.onload = function(e) {
                 imageElement.src = e.target.result;
                 previewContainer.style.display = 'block';
+                
+                // Initialize cropper without fixed aspect ratio for free cropping
                 const cropper = new Cropper(imageElement, {
-                    aspectRatio: 16 / 9,
-                    viewMode: 1,
-                    responsive: true,
+                    viewMode: 1,           // Ensures cropping stays within image bounds
+                    responsive: true,      // Makes cropper responsive to window resizing
+                    rotatable: true,       // Allows rotation of the image (optional)
+                    scalable: true,        // Allows scaling the cropping area (optional)
                 });
                 
                 saveButton.style.display = 'inline-block';
                 saveButton.onclick = function() {
-                    const croppedCanvas = cropper.getCroppedCanvas();
-                    croppedPreview.src = croppedCanvas.toDataURL();
+                    const croppedCanvas = cropper.getCroppedCanvas({
+                        width: imageElement.naturalWidth,   // Retain original width (without scaling)
+                        height: imageElement.naturalHeight, // Retain original height (without scaling)
+                    });
+
+                    // Optional: Set image smoothing for better quality
+                    const ctx = croppedCanvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    croppedPreview.src = croppedCanvas.toDataURL('image/png'); // Save as PNG for better quality
                     croppedPreview.style.display = 'block';
 
                     // Save the cropped image as base64 to the hidden input field
-                    hiddenInput.value = croppedCanvas.toDataURL();  // Store cropped image in the hidden input
+                    hiddenInput.value = croppedCanvas.toDataURL('image/png'); // Use PNG for better quality (lossless)
                 };
+
+
             };
             reader.readAsDataURL(file);
         }

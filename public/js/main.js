@@ -158,6 +158,57 @@
     });
 
     /*-------------------
+		Image maginifier
+	--------------------- */
+
+    const lens = document.querySelector('.magnifier-lens'); 
+    const mainImage = document.querySelector('.main-img-container');
+    const mainImageTag = document.querySelector('.main-img-container img');  // Get the image inside the container
+    const magnified = document.querySelector('.magnified-image'); 
+    
+    function magnify() {
+        lens.addEventListener('mousemove', moveLens);  
+        mainImage.addEventListener('mousemove', moveLens);  
+        mainImage.addEventListener('mouseout', leaveLens);  
+    }
+    
+    function moveLens(e) {
+        const mainImageRect = mainImage.getBoundingClientRect();
+        let x = e.clientX - mainImageRect.left - lens.offsetWidth / 2;
+        let y = e.clientY - mainImageRect.top - lens.offsetHeight / 2;
+    
+        let cx, cy;
+    
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (x > mainImageRect.width - lens.offsetWidth) x = mainImageRect.width - lens.offsetWidth;
+        if (y > mainImageRect.height - lens.offsetHeight) y = mainImageRect.height - lens.offsetHeight;
+    
+        lens.style.left = `${x}px`;
+        lens.style.top = `${y}px`;
+    
+        cx = magnified.offsetWidth / lens.offsetWidth;
+        cy = magnified.offsetHeight / lens.offsetHeight;
+    
+        magnified.style.cssText = `background: url('${mainImageTag.src}')
+                                   -${x * cx}px -${y * cy}px /
+                                   ${mainImageRect.width * cx}px ${mainImageRect.height * cy}px
+                                   no-repeat`;
+    
+        lens.classList.add('active');
+        magnified.classList.add('active');
+    }
+    
+    function leaveLens() {
+        lens.classList.remove('active');
+        magnified.classList.remove('active');
+    }
+    
+    magnify();
+    
+
+
+    /*-------------------
 		Quantity change
 	--------------------- */
     var proQty = $('.pro-qty');
