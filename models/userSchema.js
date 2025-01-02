@@ -62,7 +62,7 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    searchHistory: {
+    searchHistory: [{
         category: {
             type: Schema.Types.ObjectId,
             ref: 'Category'
@@ -74,7 +74,8 @@ const userSchema = new Schema({
             type: Date,
             default: Date.now
         }
-    },
+    }],
+    
     isDeleted: {
         type: Boolean,
         default: false,

@@ -125,7 +125,9 @@
                                 <div class="product-title-container">
                                     <h6><%= product[i].productName %></h6>
                                 </div>
-                                <h5>&#8377 <%= product[i].salePrice %></h5>
+                                <span class="h5">&#8377 <%= product[i].salePrice %></span>
+                                    <span class="small text-muted ml-2">M.R.P: <s>&#8377 <%= product[i].regularPrice %></s></span><br>
+                                
                                 <a href="/addToCart?id=<%= product[i]._id %>" class="add-to-cart-btn">Add to cart</a>
                             </div>
                         </div>

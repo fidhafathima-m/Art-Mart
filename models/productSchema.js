@@ -10,6 +10,10 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
+    highlights: { 
+        type: [String], 
+        default: [] 
+    },
     brand: {
         type: String,
         required: false
@@ -49,7 +53,7 @@ const productSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['Available', 'out of stock', 'Discontinued'],
+        enum: ['Available', 'Out of Stock', 'Discontinued'],
         required: true,
         default: 'Available'
     },

@@ -107,6 +107,10 @@ ol {
 	margin: 0;
 }
 
+a {
+	text-decoration: none !important;
+}
+
 /*---------------------
   Helper CSS
 -----------------------*/
@@ -4113,10 +4117,11 @@ ol {
 .magnified-image {
 	position: absolute;
 	width: 100%;
-	height: 50%;
+	height: 61%;
 	background-color: #33a3ff30;
 	transform: scale(0.5);
 	opacity: 0;
+	z-index: 10;
 }
 .magnified-image.active {
 	opacity: 1;
@@ -4223,4 +4228,6 @@ ol {
 	font-weight: bold;
 	margin-top: 15px;
   }
+
+  
   

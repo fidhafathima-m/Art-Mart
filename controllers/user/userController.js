@@ -37,6 +37,7 @@ const sendVeificationMail = async (email, otp) => {
 
     } catch (error) {
         console.log('Error sending mail', error);
+        console.error('Stack Trace:', error.stack);  
         throw new Error('Failed to send verification email');
     }
 }
@@ -70,9 +71,9 @@ const loadHomePage = async (req, res) => {
             {
                 isBlocked: false,
                 category: { $in: categories.map(category => category._id) },
-                quantity: { $gt: 0 }
+                // quantity: { $gt: 0 }
             }
-        ).select('productName productImage salePrice createdAt');  // Optimize fields
+        ).select('productName productImage salePrice createdAt regularPrice');  // Optimize fields
 
         // Sort products and limit to 4
         productsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -259,20 +260,20 @@ const loadShopping = async (req, res) => {
         const categories = await Category.find({isListed: true, isDeleted: false});
         const categoryIds = categories.map((category) => category._id.toString());
         const page = parseInt(req.query.page) || 1;
-        const limit = 9;
+        const limit = 6;
         const skip = (page - 1) * limit;
         const products = await Product.find({ 
             isBlocked: false, 
             isDeleted: false,
             category: {$in: categoryIds},
-            quantity: { $gt: 0 } 
+            // quantity: { $gt: 0 } 
         }).sort({createdAt: -1}).skip(skip).limit(limit);
 
         const totalProducts = await Product.countDocuments({
             isBlocked: false, 
             isDeleted: false,
             category: {$in: categoryIds},
-            quantity: { $gt: 0 } 
+            // quantity: { $gt: 0 } 
         });
         const totalPages = Math.ceil(totalProducts / limit);
         
@@ -305,7 +306,7 @@ const filterProduct = async (req, res) => {
 
         const query = {
             isBlocked: false,
-            quantity: { $gt: 0 }
+            // quantity: { $gt: 0 }
         };
 
         // If category is found, add it to the query
@@ -377,7 +378,7 @@ const filterByPrice = async(req, res)=> {
             salePrice: {$gt: req.query.gt, $lt: req.query.lt},
             isBlocked: false,
             isDeleted: false,
-            quantity: {$gt: 0}
+            // quantity: {$gt: 0}
         }).lean();
 
         findProducts.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -431,7 +432,7 @@ const searchProducts = async(req, res) => {
             searchResult = await Product.find({
                 productName: {$regex: '.*' + search + '.*', $options: 'i'},
                 isBlocked: false,
-                quantity: {$gt: 0},
+                // quantity: {$gt: 0},
                 category: {$in: categoryids}
             })
         }

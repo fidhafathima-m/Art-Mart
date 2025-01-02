@@ -27,6 +27,15 @@
             <div class="invalid-feedback" id="descriptionError">Please enter the product description.</div>
         </div>
 
+        <!-- product highlights -->
+        <div class="form-group">
+            <label for="highlights">Product Highlights</label>
+            <div id="highlights-list">
+              <input type="text" name="highlights[]" class="form-control mb-2" placeholder="Enter highlight" />
+            </div>
+            <button type="button" id="add-highlight" class="btn btn-secondary mt-2">Add Another Highlight</button>
+          </div>
+
         <!-- Price and Quantity -->
         <div class="form-group row">
             <label for="regularPrice" class="col-sm-2 col-form-label">Regular Price</label>
@@ -34,10 +43,10 @@
                 <input type="number" id="regularPrice" name="regularPrice" class="form-control"  placeholder="Enter regular price" min="0" step="0.01">
                 <div class="invalid-feedback" id="regularPriceError">Please enter the regular price.</div>
             </div>
-            <label for="salePrice" class="col-sm-2 col-form-label">Sale Price</label>
+            <label for="productOffer" class="col-sm-2 col-form-label">Offer Percentage</label>
             <div class="col-sm-4">
-                <input type="number" id="salePrice" name="salePrice" class="form-control"  placeholder="Enter sale price" min="0" step="0.01">
-                <div class="invalid-feedback" id="salePriceError">Please enter the sale price.</div>
+                <input type="number" id="offerPrice" name="productOffer" class="form-control"  placeholder="Enter Offer percentage" min="0" step="0.01">
+                <div class="invalid-feedback" id="offerPriceError">Please enter the Offer in Percentage.</div>
             </div>
         </div>
 
@@ -45,7 +54,7 @@
         <div class="form-group row">
             <label for="quantity" class="col-sm-2 col-form-label">Quantity</label>
             <div class="col-sm-4">
-                <input type="number" id="quantity" name="quantity" class="form-control"  placeholder="Enter quantity" min="1">
+                <input type="number" id="quantity" name="quantity" class="form-control"  placeholder="Enter quantity" min="0">
                 <div class="invalid-feedback" id="quantityError">Please enter the quantity.</div>
             </div>
             <label for="category" class="col-sm-2 col-form-label">Category</label>
@@ -122,9 +131,22 @@
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
 
 <script>
+
+document.getElementById("add-highlight").addEventListener("click", function() {
+    // Create a new input field for the highlights list
+    const newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.name = "highlights[]";  // Name the inputs the same so they will be treated as an array
+    newInput.className = "form-control mb-2";  // Apply styles for the input
+    newInput.placeholder = "Enter highlight";  // Placeholder for the input
+
+    // Append the new input field to the #highlights-list container
+    document.getElementById("highlights-list").appendChild(newInput);
+  });
     // Form Validation
     function validateForm() {
         let isValid = true;
+        
         
         // Check Product Name
         if (document.getElementById('productName').value.trim() === "") {
@@ -150,12 +172,12 @@
             document.getElementById('regularPrice').classList.remove('is-invalid');
         }
 
-        if (document.getElementById('salePrice').value <= 0) {
-            document.getElementById('salePrice').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('salePrice').classList.remove('is-invalid');
-        }
+        // if (document.getElementById('offerPrice').value <= 0) {
+        //     document.getElementById('offerPrice').classList.add('is-invalid');
+        //     isValid = false;
+        // } else {
+        //     document.getElementById('offerPrice').classList.remove('is-invalid');
+        // }
 
         // Check Quantity
         if (document.getElementById('quantity').value <= 0) {

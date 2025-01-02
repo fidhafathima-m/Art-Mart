@@ -5,6 +5,7 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
+const multer = require('multer');
 
 
 const productInfo = async (req, res) => {
@@ -65,6 +66,8 @@ const loadAddProduct = async (req, res) => {
 const addProduct = async (req, res) => {
     try {
         const products = req.body;
+        
+        // Check if the product already exists
         const productExists = await Product.findOne({
             productName: products.productName, isDeleted: false
         });
@@ -88,6 +91,7 @@ const addProduct = async (req, res) => {
                 }
             }
 
+            // Validate category ID
             const categoryId = await Category.findOne({ 
                 _id: new mongoose.Types.ObjectId(products.category.trim()), // Convert string to ObjectId
                 isListed: true,
@@ -98,16 +102,34 @@ const addProduct = async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Invalid category ID' });
             }
 
+            // Calculate the offer price
+            const percentage = products.productOffer || 0;  // Default to 0 if no productOffer provided
+            const salePrice = products.regularPrice - (Math.floor(products.regularPrice * (percentage / 100)));  // Apply the offer discount
+
+            if (salePrice < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid percentage: The offer leads to a negative sale price. Please adjust the percentage.'
+                });
+            }
+
+            // Process highlights - array of strings
+            const highlights = products.highlights.filter(highlight => highlight.trim() !== '');
+
+            const status = products.quantity > 0 ? 'Available' : 'Out of Stock'
+
             const newProduct = new Product({
                 productName: products.productName,
                 description: products.description,
+                highlights: highlights,
                 category: categoryId._id,
                 regularPrice: products.regularPrice,
-                salePrice: products.salePrice,
+                productOffer: percentage, // Store the percentage of the offer
+                salePrice: salePrice, // Set sale price after discount
                 createdAt: new Date(),
                 quantity: products.quantity,
                 productImage: images, // Save the processed image paths
-                status: 'Available'
+                status: status
             });
 
             await newProduct.save();
@@ -116,15 +138,15 @@ const addProduct = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Product already exists' });
         }
     } catch (error) {
-        if (err instanceof multer.MulterError) {
+        if (error instanceof multer.MulterError) {
             res.status(400).json({ success: false, message: 'Only image files are allowed' });
-          } else {
+        } else {
             console.log(error);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
-          }
         }
-        
-    };
+    }
+};
+
 
 const loadEditProduct = async (req, res) => {
     try {
@@ -219,6 +241,7 @@ const deleteProduct = async (req, res) => {
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
+        
 
         const images = [...product.productImage]; // Start with existing images
 
@@ -254,16 +277,32 @@ const deleteProduct = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid category ID' });
         }
 
+        // Calculate the offer price using the discount percentage (productOffer)
+        const percentage = products.productOffer || 0;  // Default to 0 if no productOffer provided
+        const salePrice = products.regularPrice - (Math.floor(products.regularPrice * (percentage / 100)));  // Apply the offer discount
+        const highlights = products.highlights.filter(highlight => highlight.trim() !== '');
+        const status = products.quantity > 0 ? 'Available' : 'Out of Stock'
+
+
+        if (salePrice < 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid percentage: The offer leads to a negative sale price. Please adjust the percentage.'
+            });
+        }
+
         // Prepare updated data for the product
         const updateData = {
             productName: products.productName,
             description: products.description,
+            highlights: highlights,
             category: categoryId._id,
             regularPrice: products.regularPrice,
-            salePrice: products.salePrice,
+            productOffer: percentage, // Store the percentage of the offer
+            salePrice: salePrice,  // Save the calculated offerPrice
             quantity: products.quantity,
             productImage: images,  // Use the updated images array (existing + new images)
-            status: 'Available',  // Assuming you want to maintain the same status
+            status: status,  // Assuming you want to maintain the same status
         };
 
         // Update the product in the database
@@ -276,6 +315,7 @@ const deleteProduct = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+
 
 
 
@@ -329,6 +369,45 @@ const deleteSingleImage = async (req, res) => {
     }
 };
 
+const addProductOffer = async(req, res) => {
+    try {
+        const {productId, percentage} = req.body;
+        const findProduct = await Product.findOne({_id: productId});
+        findProduct.salePrice = findProduct.salePrice - Math.floor(findProduct.regularPrice * (percentage / 100));
+        findProduct.productOffer = parseInt(percentage);
+
+        if (findProduct.salePrice < 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid percentage: The offer leads to a negative sale price. Please adjust the percentage.'
+            });
+        }
+        await findProduct.save();
+        res.json({status: true});
+    } catch (error) {
+        console.log(error)
+        res.redirect('/admin/pageError');
+        res.status(500).json({status: false, message: 'Internal Server Error'});
+    }
+}
+
+const removeProductOffer = async (req, res) => {
+    try {
+        
+        const {productId} = req.body;
+        const findProduct = await Product.findOne({_id: productId});
+        const percentage = findProduct.productOffer;
+        findProduct.salePrice = findProduct.salePrice + Math.floor(findProduct.regularPrice * (percentage / 100));
+        findProduct.productOffer = 0;
+        await findProduct.save();
+        res.json({status: true});
+
+    } catch (error) {
+        console.log(error);
+        res.redirect('/admin/pageError');
+    }
+}
+
 // Block Product
 const blockProduct = async (req, res) => {
     try {
@@ -360,6 +439,8 @@ module.exports = {
     loadEditProduct,
     editProduct,
     deleteSingleImage,
+    addProductOffer,
+    removeProductOffer,
     blockProduct,
     unblockProduct,
     deleteProduct,

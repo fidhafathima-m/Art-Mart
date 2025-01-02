@@ -77,6 +77,8 @@ router.post('/add-product', adminAuth.isLogin,upload.array("images", 3),  produc
 router.get('/edit-product', adminAuth.isLogin,  productController.loadEditProduct);
 router.post('/edit-product/:id', adminAuth.isLogin, upload.array("images", 3),  productController.editProduct);
 router.post('/deleteImage', adminAuth.isLogin, productController.deleteSingleImage);
+router.post('/addProductOffer', adminAuth.isLogin, productController.addProductOffer)
+router.post('/removeProductOffer', adminAuth.isLogin, productController.removeProductOffer)
 router.post('/block-product', adminAuth.isLogin, productController.blockProduct);
 router.post('/unblock-product', adminAuth.isLogin, productController.unblockProduct);
 router.patch('/delete-product/:id',  productController.deleteProduct);

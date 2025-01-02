@@ -32,7 +32,7 @@
                         <form method="GET" action="/search">
                             <div class="input-group mb-3">
                             <input type="text" class="form-control" name="search" placeholder="Search ..." aria-label="Search" aria-describedby="basic-addon2">
-                            <button type="submit"><span class="icon_search"></span></button>
+                            <button class="btn btn-primary p-2" type="submit">Search</button>
                             </div>
                         </form>
                     </div>
@@ -231,8 +231,15 @@
                                         <i class="fa fa-star-o"></i>
                                         <i class="fa fa-star-o"></i>
                                     </div> -->
-                                    <h5>&#8377 <%= products[i].salePrice.toLocaleString('en-IN') %></h5>
-                                    <span class="text-muted"><strike>&#8377 <%= products[i].regularPrice.toLocaleString('en-IN') %></strike></span>
+                                    <span class="h5">&#8377 <%= products[i].salePrice.toLocaleString('en-IN') %></span>
+                                    <% if (products[i].productOffer > 0) { %>
+                                        <span class="small">(<%= products[i].productOffer %>% off)</span>
+                                        <% if (products[i].quantity <= 0) { %>
+                                            <span class="badge badge-danger">Out of Stock</span><br>
+                                            <% } %>
+                                        <p class="text-muted"><strike>&#8377 <%= products[i].regularPrice.toLocaleString('en-IN') %></strike></p>
+                                    <% } %>
+                                    
                                 
                             </div>
                         </div>
