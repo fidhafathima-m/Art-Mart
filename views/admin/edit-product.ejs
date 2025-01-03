@@ -1,360 +1,324 @@
 <%- include('../../views/partials/admin/header') %>
 
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet">
+  <link
+    href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css"
+    rel="stylesheet"
+  />
 </head>
 
 <div class="wrapper">
   <%- include('../../views/partials/admin/sidebar') %>
 
   <div class="container">
-        <h1 class="my-4">Edit Product</h1>
+    <h1 class="my-4">Edit Product</h1>
 
-        <!-- Category Form -->
-        <form id="editProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" class="form-horizontal" enctype="multipart/form-data" onsubmit="return validateForm();">
-        
-            <!-- Product Name -->
-            <div class="form-group">
-                <label for="productName" class="form-label">Product Name</label>
-                <input type="text" id="productName" name="productName" class="form-control" value="<%= product.productName %>" placeholder="Enter Product name">
-                <div class="invalid-feedback" id="productNameError">Please enter the product name.</div>
-            </div>
+    <!-- Category Form -->
+    <form
+      id="editProductForm"
+      action="/admin/edit-product/<%= product._id %>"
+      method="POST"
+      class="form-horizontal"
+      enctype="multipart/form-data"
+      onsubmit="return validateForm();"
+    >
+      <!-- Product Name -->
+      <div class="form-group">
+        <label for="productName" class="form-label">Product Name</label>
+        <input
+          type="text"
+          id="productName"
+          name="productName"
+          class="form-control"
+          value="<%= product.productName %>"
+          placeholder="Enter Product name"
+        />
+        <div class="invalid-feedback" id="productNameError">
+          Please enter the product name.
+        </div>
+      </div>
 
-            <!-- Product Description -->
-            <div class="form-group">
-                <label for="description" class="form-label">Product Description</label>
-                <textarea id="description" name="description" class="form-control" required placeholder="Enter product description"><%= product.description %></textarea>
-            </div>
+      <!-- Product Description -->
+      <div class="form-group">
+        <label for="description" class="form-label">Product Description</label>
+        <textarea
+          id="description"
+          name="description"
+          class="form-control"
+          required
+          placeholder="Enter product description"
+        >
+<%= product.description %></textarea
+        >
+      </div>
 
-            <div class="form-group">
-            <label for="highlights">Product Highlights</label>
-            <div id="highlights-list">
-              <!-- Pre-fill existing highlights -->
-              <% product.highlights.forEach((highlight, index) => { %>
-                <input type="text" name="highlights[]" class="form-control mb-2" value="<%= highlight %>" placeholder="Enter highlight" />
-              <% }) %>
-        
-              <!-- Add button for adding more highlights -->
-              <input type="text" name="highlights[]" class="form-control mb-2" placeholder="Enter highlight" />
-            </div>
-            <button type="button" id="add-highlight" class="btn btn-secondary mt-2">Add Another Highlight</button>
+      <div class="form-group">
+        <label for="highlights">Product Highlights</label>
+        <div id="highlights-list">
+          <!-- Pre-fill existing highlights -->
+          <% product.highlights.forEach((highlight, index) => { %>
+          <input
+            type="text"
+            name="highlights[]"
+            class="form-control mb-2"
+            value="<%= highlight %>"
+            placeholder="Enter highlight"
+          />
+          <% }) %>
+
+          <!-- Add button for adding more highlights -->
+          <input
+            type="text"
+            name="highlights[]"
+            class="form-control mb-2"
+            placeholder="Enter highlight"
+          />
+        </div>
+        <button type="button" id="add-highlight" class="btn btn-secondary mt-2">
+          Add Another Highlight
+        </button>
+      </div>
+
+      <!-- Price and Quantity -->
+      <div class="form-group row">
+        <label for="regularPrice" class="col-sm-2 col-form-label"
+          >Regular Price</label
+        >
+        <div class="col-sm-4">
+          <input
+            type="number"
+            id="regularPrice"
+            name="regularPrice"
+            class="form-control"
+            value="<%= product.regularPrice %>"
+            placeholder="Enter regular price"
+            min="0"
+            step="0.01"
+          />
+          <div class="invalid-feedback" id="regularPriceError">
+            Please enter the regular price.
           </div>
-
-            <!-- Price and Quantity -->
-            <div class="form-group row">
-                <label for="regularPrice" class="col-sm-2 col-form-label">Regular Price</label>
-                <div class="col-sm-4">
-                    <input type="number" id="regularPrice" name="regularPrice" class="form-control" value="<%= product.regularPrice %>"  placeholder="Enter regular price" min="0" step="0.01">
-                    <div class="invalid-feedback" id="regularPriceError">Please enter the regular price.</div>
-                </div>
-                <label for="productOffer" class="col-sm-2 col-form-label">Offer Percentage</label>
-            <div class="col-sm-4">
-                <input type="number" id="productOffer" name="productOffer" class="form-control" value="<%= product.productOffer %>"  placeholder="Enter Offer percentage" min="0" step="0.01">
-                <div class="invalid-feedback" id="productOfferError">Please enter the Offer in Percentage.</div>
-            </div>
-            </div>
-
-            <!-- Quantity and Category -->
-            <div class="form-group row">
-                <label for="quantity" class="col-sm-2 col-form-label">Quantity</label>
-                <div class="col-sm-4">
-                    <input type="number" id="quantity" name="quantity" class="form-control" value="<%= product.quantity %>"  placeholder="Enter quantity" min="0">
-                    <div class="invalid-feedback" id="quantityError">Please enter the quantity.</div>
-                </div>
-                <label for="category" class="col-sm-2 col-form-label">Category</label>
-                <div class="col-sm-4">
-                    <select id="category" name="category" class="form-control">
-                        <% categories.forEach(function(category) { %>
-                            <option value="<%= category._id %>" 
-                                <% if (category._id.toString() === product.category.toString()) { %>
-                                    selected
-                                <% } %>
-                            >
-                                <%= category.name %>
-                            </option>
-                        <% }); %>
-                    </select>
-                </div>
-            </div>
-
-            <div class="card mb-2">
-                <div class="card-header">
-                    <h4>Edit images</h4>
-                </div>
-            </div>
-
-
-            <% for (let i = 0; i < product.productImage.length; i++) { %>
-                <div class="col-md-12">
-                    <div class="mb-4">
-                        <td>
-                            <input type="hidden" id="imageDatas" value="<%= product.productImage[i] %>">
-                            <img src="<%= product.productImage[i] %>" alt="" class="rounded" style="width: 100px; height: 120px;">
-                            <i class="bi bi-x delete-image" data-image-id="<%= product.productImage[i] %>" data-product-id="<%= product._id %>" style="position: absolute; margin-left: .5rem; cursor: pointer;"></i>
-
-                            
-                        </td>
-                    </div>
-                </div>
-            <% } %>
-
-            <!-- Image 1 Upload and Cropping -->
-        <div class="form-group">
-            <label for="image1" class="form-label">Choose Image 1</label>
-            <input type="file" id="image1" name="images" class="form-control" accept="image/*" >
-            <div id="image1-preview" class="image-container" style="width: 100%; height: 400px; display: none;">
-                <img id="image1-preview-img" src="" alt="Image 1" style="max-width: 100%; height: auto;">
-            </div>
-            <div>
-                <button type="button" id="saveImage1" class="btn btn-secondary" style="display:none;">Save Cropped Image</button>
-                <div id="croppedImage1Preview" style="margin-top: 10px;">
-                    <img id="croppedImage1" src="" alt="Cropped Image 1" style="max-width: 100%; height: auto;">
-                </div>
-            </div>
         </div>
-
-        <!-- Image 2 Upload and Cropping -->
-        <div class="form-group">
-            <label for="image2" class="form-label">Choose Image 2</label>
-            <input type="file" id="image2" name="images" class="form-control" accept="image/*" >
-            <div id="image2-preview" class="image-container" style="width: 100%; height: 400px; display: none;">
-                <img id="image2-preview-img" src="" alt="Image 2" style="max-width: 100%; height: auto;">
-            </div>
-            <div>
-                <button type="button" id="saveImage2" class="btn btn-secondary" style="display:none;">Save Cropped Image</button>
-                <div id="croppedImage2Preview" style="margin-top: 10px;">
-                    <img id="croppedImage2" src="" alt="Cropped Image 2" style="max-width: 100%; height: auto;">
-                </div>
-            </div>
+        <label for="productOffer" class="col-sm-2 col-form-label"
+          >Offer Percentage</label
+        >
+        <div class="col-sm-4">
+          <input
+            type="number"
+            id="productOffer"
+            name="productOffer"
+            class="form-control"
+            value="<%= product.productOffer %>"
+            placeholder="Enter Offer percentage"
+            min="0"
+            step="0.01"
+          />
+          <div class="invalid-feedback" id="productOfferError">
+            Please enter the Offer in Percentage.
+          </div>
         </div>
+      </div>
 
-        <!-- Image 3 Upload and Cropping -->
-        <div class="form-group">
-            <label for="image3" class="form-label">Choose Image 3</label>
-            <input type="file" id="image3" name="images" class="form-control" accept="image/*" >
-            <div id="image3-preview" class="image-container" style="width: 100%; height: 400px; display: none;">
-                <img id="image3-preview-img" src="" alt="Image 3" style="max-width: 100%; height: auto;">
-            </div>
-            <div>
-                <button type="button" id="saveImage3" class="btn btn-secondary" style="display:none;">Save Cropped Image</button>
-                <div id="croppedImage3Preview" style="margin-top: 10px;">
-                    <img id="croppedImage3" src="" alt="Cropped Image 3" style="max-width: 100%; height: auto;">
-                </div>
-            </div>
+      <!-- Quantity and Category -->
+      <div class="form-group row">
+        <label for="quantity" class="col-sm-2 col-form-label">Quantity</label>
+        <div class="col-sm-4">
+          <input
+            type="number"
+            id="quantity"
+            name="quantity"
+            class="form-control"
+            value="<%= product.quantity %>"
+            placeholder="Enter quantity"
+            min="0"
+          />
+          <div class="invalid-feedback" id="quantityError">
+            Please enter the quantity.
+          </div>
         </div>
+        <label for="category" class="col-sm-2 col-form-label">Category</label>
+        <div class="col-sm-4">
+          <select id="category" name="category" class="form-control">
+            <% categories.forEach(function(category) { %> <option value="<%=
+            category._id %>" <% if (category._id.toString() ===
+            product.category.toString()) { %> selected <% } %>> <%=
+            category.name %> <% }); %>
+          </select>
+        </div>
+      </div>
 
-        <!-- Hidden input for cropped images -->
-    <input type="hidden" id="croppedImage1Data" name="croppedImage1">
-    <input type="hidden" id="croppedImage2Data" name="croppedImage2">
-    <input type="hidden" id="croppedImage3Data" name="croppedImage3">
-                                   
-            <button type="submit" class="btn btn-primary mb-3">Update Product</button>
-            <a href="/admin/products" class="btn btn-danger mb-3">Cancel</a>
-        </form>
-    </div>
+      <div class="card mb-2">
+        <div class="card-header">
+          <h4>Edit images</h4>
+        </div>
+      </div>
+
+      <% for (let i = 0; i < product.productImage.length; i++) { %>
+      <div class="col-md-12">
+        <div class="mb-4">
+          <td>
+            <input
+              type="hidden"
+              id="imageDatas"
+              value="<%= product.productImage[i] %>"
+            />
+            <img
+              src="<%= product.productImage[i] %>"
+              alt=""
+              class="rounded"
+              style="width: 100px; height: 120px"
+            />
+            <i
+              class="bi bi-x delete-image"
+              data-image-id="<%= product.productImage[i] %>"
+              data-product-id="<%= product._id %>"
+              style="position: absolute; margin-left: 0.5rem; cursor: pointer"
+            ></i>
+          </td>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Image 1 Upload and Cropping -->
+      <div class="form-group">
+        <label for="image1" class="form-label">Choose Image 1</label>
+        <input
+          type="file"
+          id="image1"
+          name="images"
+          class="form-control"
+          accept="image/*"
+        />
+        <div
+          id="image1-preview"
+          class="image-container"
+          style="width: 100%; height: 400px; display: none"
+        >
+          <img
+            id="image1-preview-img"
+            src=""
+            alt="Image 1"
+            style="max-width: 100%; height: auto"
+          />
+        </div>
+        <div>
+          <button
+            type="button"
+            id="saveImage1"
+            class="btn btn-secondary"
+            style="display: none"
+          >
+            Save Cropped Image
+          </button>
+          <div id="croppedImage1Preview" style="margin-top: 10px">
+            <img
+              id="croppedImage1"
+              src=""
+              alt="Cropped Image 1"
+              style="max-width: 100%; height: auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Image 2 Upload and Cropping -->
+      <div class="form-group">
+        <label for="image2" class="form-label">Choose Image 2</label>
+        <input
+          type="file"
+          id="image2"
+          name="images"
+          class="form-control"
+          accept="image/*"
+        />
+        <div
+          id="image2-preview"
+          class="image-container"
+          style="width: 100%; height: 400px; display: none"
+        >
+          <img
+            id="image2-preview-img"
+            src=""
+            alt="Image 2"
+            style="max-width: 100%; height: auto"
+          />
+        </div>
+        <div>
+          <button
+            type="button"
+            id="saveImage2"
+            class="btn btn-secondary"
+            style="display: none"
+          >
+            Save Cropped Image
+          </button>
+          <div id="croppedImage2Preview" style="margin-top: 10px">
+            <img
+              id="croppedImage2"
+              src=""
+              alt="Cropped Image 2"
+              style="max-width: 100%; height: auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Image 3 Upload and Cropping -->
+      <div class="form-group">
+        <label for="image3" class="form-label">Choose Image 3</label>
+        <input
+          type="file"
+          id="image3"
+          name="images"
+          class="form-control"
+          accept="image/*"
+        />
+        <div
+          id="image3-preview"
+          class="image-container"
+          style="width: 100%; height: 400px; display: none"
+        >
+          <img
+            id="image3-preview-img"
+            src=""
+            alt="Image 3"
+            style="max-width: 100%; height: auto"
+          />
+        </div>
+        <div>
+          <button
+            type="button"
+            id="saveImage3"
+            class="btn btn-secondary"
+            style="display: none"
+          >
+            Save Cropped Image
+          </button>
+          <div id="croppedImage3Preview" style="margin-top: 10px">
+            <img
+              id="croppedImage3"
+              src=""
+              alt="Cropped Image 3"
+              style="max-width: 100%; height: auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden input for cropped images -->
+      <input type="hidden" id="croppedImage1Data" name="croppedImage1" />
+      <input type="hidden" id="croppedImage2Data" name="croppedImage2" />
+      <input type="hidden" id="croppedImage3Data" name="croppedImage3" />
+
+      <button type="submit" class="btn btn-primary mb-3">Update Product</button>
+      <a href="/admin/products" class="btn btn-danger mb-3">Cancel</a>
+    </form>
+  </div>
 </div>
 <%- include('../../views/partials/admin/footer') %>
-
-
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
 
-<script>
-
-document.getElementById("add-highlight").addEventListener("click", function() {
-    const newInput = document.createElement("input");
-    newInput.type = "text";
-    newInput.name = "highlights[]";  // Use an array notation for the name
-    newInput.className = "form-control mb-2";
-    newInput.placeholder = "Enter highlight";  // Add a placeholder for the input
-
-    document.getElementById("highlights-list").appendChild(newInput);
-  });
-
-    // Form Validation
-    function validateForm() {
-        let isValid = true;
-        
-        // Check Product Name
-        if (document.getElementById('productName').value.trim() === "") {
-            document.getElementById('productName').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('productName').classList.remove('is-invalid');
-        }
-
-        // Check Description
-        if (document.getElementById('description').value.trim() === "") {
-            document.getElementById('description').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('description').classList.remove('is-invalid');
-        }
-
-        // Check Price
-        if (document.getElementById('regularPrice').value <= 0) {
-            document.getElementById('regularPrice').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('regularPrice').classList.remove('is-invalid');
-        }
-
-        // if (document.getElementById('productOffer').value <= 0) {
-        //     document.getElementById('productOffer').classList.add('is-invalid');
-        //     isValid = false;
-        // } else {
-        //     document.getElementById('productOffer').classList.remove('is-invalid');
-        // }
-
-        // Check Quantity
-        if (document.getElementById('quantity').value <= 0) {
-            document.getElementById('quantity').classList.add('is-invalid');
-            isValid = false;
-        } else {
-            document.getElementById('quantity').classList.remove('is-invalid');
-        }
-
-        // Check Images
-        // if (!document.getElementById('image1').files[0] || !document.getElementById('image2').files[0] || !document.getElementById('image3').files[0]) {
-        //     alert('Please upload all images.');
-        //     isValid = false;
-        // }
-
-        return isValid;
-    }
-    function handleImageUpload(inputId, previewId, saveButtonId, croppedPreviewId, hiddenInputId) {
-    const inputElement = document.getElementById(inputId);
-    const previewContainer = document.getElementById(previewId);
-    const imageElement = document.getElementById(previewId + '-img');
-    const saveButton = document.getElementById(saveButtonId);
-    const croppedPreview = document.getElementById(croppedPreviewId);
-    const hiddenInput = document.getElementById(hiddenInputId); // Hidden input for cropped image
-    
-    croppedPreview.style.display = 'none';
-
-    inputElement.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imageElement.src = e.target.result;
-                previewContainer.style.display = 'block';
-                
-                // Initialize cropper without fixed aspect ratio for free cropping
-                const cropper = new Cropper(imageElement, {
-                    viewMode: 1,           // Ensures cropping stays within image bounds
-                    responsive: true,      // Makes cropper responsive to window resizing
-                    rotatable: true,       // Allows rotation of the image (optional)
-                    scalable: true,        // Allows scaling the cropping area (optional)
-                });
-                
-                saveButton.style.display = 'inline-block';
-                saveButton.onclick = function() {
-                    const croppedCanvas = cropper.getCroppedCanvas({
-                        width: imageElement.naturalWidth,   // Retain original width (without scaling)
-                        height: imageElement.naturalHeight, // Retain original height (without scaling)
-                    });
-
-                    // Optional: Set image smoothing for better quality
-                    const ctx = croppedCanvas.getContext('2d');
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-
-                    croppedPreview.src = croppedCanvas.toDataURL('image/png'); // Save as PNG for better quality
-                    croppedPreview.style.display = 'block';
-
-                    // Save the cropped image as base64 to the hidden input field
-                    hiddenInput.value = croppedCanvas.toDataURL('image/png'); // Use PNG for better quality (lossless)
-                };
-
-
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-}
-
-// Apply to each image with corresponding hidden input field for cropped image
-handleImageUpload('image1', 'image1-preview', 'saveImage1', 'croppedImage1', 'croppedImage1Data');
-handleImageUpload('image2', 'image2-preview', 'saveImage2', 'croppedImage2', 'croppedImage2Data');
-handleImageUpload('image3', 'image3-preview', 'saveImage3', 'croppedImage3', 'croppedImage3Data');
-
-$(document).ready(function() {
-    // Attach event listener to all delete icons
-    $(".delete-image").click(function() {
-        const imageId = $(this).data("image-id");
-        const productId = $(this).data("product-id");
-        console.log("Delete image clicked", imageId, productId); // This should now log when clicked
-        deleteSingleImage(imageId, productId);
-    });
-});
-
-
-function deleteSingleImage(imageId, productId) {
-    console.log("Delete image clicked", imageId, productId); // For debugging
-    
-    // Send the request via AJAX
-    $.ajax({
-        url: '/admin/deleteImage',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            imageNameToServer: imageId,
-            productIdToServer: productId
-        }),
-        success: function(response) {
-            if (response.status === true) {
-                window.location.reload();  // Reload the page to reflect the changes
-            } else {
-                alert(response.message || 'Error deleting image');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Error deleting image:", error);
-            alert('An error occurred while deleting the image.');
-        }
-    });
-}
-
-$('#editProductForm').on('submit', function(e) {
-        e.preventDefault(); // Prevent normal form submission
-
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'), // Form action URL
-            data: new FormData(this), // Send the form data including files
-            processData: false,  // Don't process the data
-            contentType: false,  // Don't set content type
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Product Updated',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => {
-                        // Redirect to products page after the alert
-                        window.location.href = '/admin/products'; // Replace with your products page URL
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'There was an error updating the product.'
-                    });
-                }
-            },
-            error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Request Failed',
-                    text: 'There was an issue connecting to the server. Please try again.'
-                });
-            }
-        });
-    });
-
-</script>
+<script src="/js/custom.js"></script>

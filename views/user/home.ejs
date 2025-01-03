@@ -1,56 +1,65 @@
 <!-- header -->
 <%- include('../../views/partials/user/header') %>
 
-    <!-- Hero Section Begin -->
-    <section class="hero">
-        <div class="hero__slider owl-carousel">
-            <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Christmas Collection</h6>
-                                <h2>Create Christmas Magic with Art Supplies</h2>
-                                <p>Unleash your holiday creativity with our festive art supplies – 
-                                    perfect for Christmas crafts and gifts!</p>
-                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-                                <div class="hero__social">
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
-                                    <a href="#"><i class="fa fa-pinterest"></i></a>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Hero Section Begin -->
+<section class="hero">
+  <div class="hero__slider owl-carousel">
+    <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5 col-lg-7 col-md-8">
+            <div class="hero__text">
+              <h6>Christmas Collection</h6>
+              <h2>Create Christmas Magic with Art Supplies</h2>
+              <p>
+                Unleash your holiday creativity with our festive art supplies –
+                perfect for Christmas crafts and gifts!
+              </p>
+              <a href="#" class="primary-btn"
+                >Shop now <span class="arrow_right"></span
+              ></a>
+              <div class="hero__social">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+                <a href="#"><i class="fa fa-pinterest"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+              </div>
             </div>
-            <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Spring Collection</h6>
-                                <h2>Awaken, Blossom, Create, Inspire</h2>
-                                <p>Embrace the fresh energy of spring through soft pastels, vibrant pigments, and premium brushes.</p>
-                                <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-                                <div class="hero__social">
-                                    <a href="#"><i class="fa fa-facebook"></i></a>
-                                    <a href="#"><i class="fa fa-twitter"></i></a>
-                                    <a href="#"><i class="fa fa-pinterest"></i></a>
-                                    <a href="#"><i class="fa fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </section>
-    <!-- Hero Section End -->
+      </div>
+    </div>
+    <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5 col-lg-7 col-md-8">
+            <div class="hero__text">
+              <h6>Spring Collection</h6>
+              <h2>Awaken, Blossom, Create, Inspire</h2>
+              <p>
+                Embrace the fresh energy of spring through soft pastels, vibrant
+                pigments, and premium brushes.
+              </p>
+              <a href="#" class="primary-btn"
+                >Shop now <span class="arrow_right"></span
+              ></a>
+              <div class="hero__social">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+                <a href="#"><i class="fa fa-pinterest"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Hero Section End -->
 
-    <!-- Banner Section Begin -->
-    <!-- <section class="banner spad">
+<!-- Banner Section Begin -->
+<!-- <section class="banner spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-7 offset-lg-4">
@@ -89,55 +98,66 @@
             </div>
         </div>
     </section> -->
-    <!-- Banner Section End -->
+<!-- Banner Section End -->
 
-    <!-- Product Section Begin -->
+<!-- Product Section Begin -->
 
-    <section class="product spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <ul class="filter__controls">
-                        <li data-filter=".new-arrivals" class="active">New Arrivals</li>
-                    </ul>
-                </div>
+<section class="product spad">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <ul class="filter__controls">
+          <li data-filter=".new-arrivals" class="active">New Arrivals</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row product__filter">
+      <% for (let i = 0; i < product.length; i++) { %>
+      <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+        <div class="product-cart-wrap mb-30">
+          <div class="product-img-action-wrap">
+            <div class="product-img product-img-zoom">
+              <a href="/product-details?id=<%= product[i]._id %>">
+                <img
+                  class="default-img img-fluid"
+                  src="<%= product[i].productImage[0] %>"
+                  alt="<%= product[i].productName %>"
+                />
+              </a>
             </div>
-            <div class="row product__filter">
-              <% for (let i = 0; i < product.length; i++) { %>
-                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                        <div class="product-cart-wrap mb-30">
-                            <div class="product-img-action-wrap">
-                                <div class="product-img product-img-zoom">
-                                    <a href="/product-details?id=<%= product[i]._id %>">
-                                        <img class="default-img img-fluid"
-                                        src="<%= product[i].productImage[0] %>"  
-                                        alt="<%= product[i].productName %>">
-                                    </a>
-                                </div>
-                                <div class="wishlist-btn-container">
-                                    <a href="/addToWishlist?id=<%= product[i]._id %>" class="wishlist-btn">
-                                        <i class="bi bi-heart"></i>
-                                    </a>
-                                </div>
-                            </div>
-      
-                            <div class="product-content-wrap">
-                                <div class="product-title-container">
-                                    <h6><%= product[i].productName %></h6>
-                                </div>
-                                <span class="h5">&#8377 <%= product[i].salePrice %></span>
-                                    <span class="small text-muted ml-2">M.R.P: <s>&#8377 <%= product[i].regularPrice %></s></span><br>
-                                
-                                <a href="/addToCart?id=<%= product[i]._id %>" class="add-to-cart-btn">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                  <% } %>
+            <div class="wishlist-btn-container">
+              <a
+                href="/addToWishlist?id=<%= product[i]._id %>"
+                class="wishlist-btn"
+              >
+                <i class="bi bi-heart"></i>
+              </a>
             </div>
+          </div>
+
+          <div class="product-content-wrap">
+            <div class="product-title-container">
+              <h6><%= product[i].productName %></h6>
+            </div>
+            <span class="h5">&#8377; <%= product[i].salePrice %></span>
+            <span class="small text-muted ml-2"
+              >M.R.P: <s>&#8377; <%= product[i].regularPrice %></s></span
+            ><br />
+
+            <a
+              href="/addToCart?id=<%= product[i]._id %>"
+              class="add-to-cart-btn"
+              >Add to cart</a
+            >
+          </div>
         </div>
-      </section>
-      
-    <!-- <section class="product spad">
+      </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- <section class="product spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -427,10 +447,10 @@
             </div>
         </div>
     </section> -->
-    <!-- Product Section End -->
+<!-- Product Section End -->
 
-    <!-- Categories Section Begin -->
-    <!-- <section class="categories spad">
+<!-- Categories Section Begin -->
+<!-- <section class="categories spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-3">
@@ -475,10 +495,10 @@
             </div>
         </div>
     </section> -->
-    <!-- Categories Section End -->
+<!-- Categories Section End -->
 
-    <!-- Instagram Section Begin -->
-    <!-- <section class="instagram spad">
+<!-- Instagram Section Begin -->
+<!-- <section class="instagram spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
@@ -502,10 +522,10 @@
             </div>
         </div>
     </section> -->
-    <!-- Instagram Section End -->
+<!-- Instagram Section End -->
 
-    <!-- Latest Blog Section Begin -->
-    <!-- <section class="latest spad">
+<!-- Latest Blog Section Begin -->
+<!-- <section class="latest spad">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -549,6 +569,6 @@
             </div>
         </div>
     </section> -->
-    <!-- Latest Blog Section End -->
-    <!-- footer -->
-     <%- include('../../views/partials/user/footer') %>
+<!-- Latest Blog Section End -->
+<!-- footer -->
+<%- include('../../views/partials/user/footer') %>

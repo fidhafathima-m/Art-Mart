@@ -1,79 +1,82 @@
-const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const productSchema = new Schema({
+const productSchema = new Schema(
+  {
     productName: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     description: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
-    highlights: { 
-        type: [String], 
-        default: [] 
+    highlights: {
+      type: [String],
+      default: [],
     },
     brand: {
-        type: String,
-        required: false
+      type: String,
+      required: false,
     },
     category: {
-        type: Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
     },
     regularPrice: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     salePrice: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     productOffer: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     quantity: {
-        type: Number,
-        default: true
+      type: Number,
+      default: true,
     },
     productImage: {
-        type: [String],
-        required: true
+      type: [String],
+      required: true,
     },
     isBlocked: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
     isListed: {
-        type: Boolean,
-        default: true
+      type: Boolean,
+      default: true,
     },
     status: {
-        type: String,
-        enum: ['Available', 'Out of Stock', 'Discontinued'],
-        required: true,
-        default: 'Available'
+      type: String,
+      enum: ["Available", "Out of Stock", "Discontinued"],
+      required: true,
+      default: "Available",
     },
     isDeleted: {
-        type: Boolean,
-        default: false,
-      },
-      deletedAt: {
-        type: Date,
-        default: null,
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-      updatedAt: {
-        type: Date,
-        default: Date.now,
-      }
-},{timestamps: true});
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
 
-const Product = mongoose.model('Product', productSchema);
+const Product = mongoose.model("Product", productSchema);
 module.exports = Product;
