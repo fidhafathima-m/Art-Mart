@@ -60,6 +60,10 @@ router.get(
   profileController.resetPasswordLoad
 );
 router.post("/reset-password", profileController.resetPassword);
+router.get('/userProfile', profileController.loadUserProfile);
+router.get('/profile/change-email', profileController.loadChangeEmail);
+router.post('/profile/change-email', profileController.changeEmail);
+router.post('/profile/verify-email-otp', profileController.verifyEmailOtp);
 
 // Product Managemrnt
 router.get("/product-details", productController.loadProductDetails);

@@ -2,6 +2,7 @@ const express = require("express");
 const env = require("dotenv").config();
 const path = require("path");
 const session = require("express-session");
+const flash = require('connect-flash');
 
 // custom
 const db = require("./config/db");
@@ -16,19 +17,22 @@ const app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// Session
+// Session middleware (must be before flash middleware)
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: false,
+      secure: false,  // Should be true if using HTTPS in production
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
     },
   })
 );
+
+// Flash middleware (after session middleware)
+app.use(flash());
 
 // Initialize Passport
 app.use(passport.initialize());

@@ -149,6 +149,87 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const loadUserProfile = async(req, res)=> {
+  try {
+    const userId = req.session.user;
+    const userData = await User.findOne({_id: userId});
+    if(userData) {
+      res.render('profile', {user: userData, currentPage: '/userProfile'});
+    } else {
+      res.redirect('/login');
+    }
+
+  } catch (error) {
+    console.log('Error in loading user profile', error);
+    res.redirect('/pageNotFound');
+  }
+}
+
+const loadChangeEmail = async(req, res) => {
+  try {
+    res.render('change-email');
+  } catch (error) {
+    console.log('Error in changing email');
+    res.redirect('/userProfile');  
+  }
+}
+
+const changeEmail = async(req, res) => {
+  try {
+    
+    const {currentEmail} = req.body;
+    const userExists = await User.findOne({email: currentEmail});
+    if (userExists) {
+      const otp = generateOtp();
+      const emailSent = await sendVeificationMail(currentEmail, otp);
+
+      if(emailSent) {
+        req.session.userOtp = otp;
+        req.session.userData = req.body;
+        req.session.email = currentEmail;
+        res.render('change-email-otp');
+        console.log('Email sent: ', currentEmail);
+        console.log('otp: ', otp);
+      } else{
+        cosnole.log('Email error')
+      } 
+    } else {
+      res.render('change-email', {message: 'User with this mail doesn\'t exists'});
+    }
+
+  } catch (error) {
+    console.log('error', error);
+    res.redirect('/pageNotFound');
+  }
+}
+
+const verifyEmailOtp = async(req, res) => {
+  try {
+    const { otp } = req.body;
+    const sessionOtp = req.session.userOtp;
+    console.log('Entered otp: ', otp)
+    console.log('session otp: ', sessionOtp);
+    console.log('user data: ', req.session.userData);
+
+    // Ensure both OTPs are strings and trimmed of any leading/trailing spaces
+    if (otp.trim() === sessionOtp.trim()) {
+      req.session.userData = req.body.userData;
+      res.render('new-email', {
+        userData: req.session.userData
+      });
+    } else {
+      res.render('change-email-otp', {
+        message: "OTP not matching",
+        userData: req.session.userData
+      });
+    }
+  } catch (error) {
+    console.log('error:', error);
+    res.redirect('/pageNotFound');
+  }
+};
+
+
 module.exports = {
   getForgetPass,
   forgotPassValid,
@@ -156,4 +237,8 @@ module.exports = {
   resendForgetPassOtp,
   resetPasswordLoad,
   resetPassword,
+  loadUserProfile,
+  loadChangeEmail,
+  changeEmail,
+  verifyEmailOtp
 };

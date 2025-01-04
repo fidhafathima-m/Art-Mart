@@ -149,4 +149,113 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script src="/js/custom.js"></script>
+<script >
+  function toggleListing(id, isList) {
+  const url = isList ? "/admin/unlistCoupon" : "/admin/listCoupon";
+  $.ajax({
+    type: "GET",
+    url: url,
+    data: { id: id },
+    success: function (response) {
+      if (response.success) {
+        Swal.fire({
+          icon: "success",
+          title: isList ? "Coupon Listed" : "Coupon Unlisted",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          location.reload();
+        });
+      }
+    },
+    error: function () {
+      Swal.fire({
+        icon: "error",
+        title: "Request Failed",
+        text: "There was an issue connecting to the server. Please try again.",
+      });
+    },
+  });
+}
+
+function deleteCoupon(couponId) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This coupon will be soft deleted.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "PATCH",
+        url: `/admin/delete-coupon/${couponId}`,
+        success: function (response) {
+          if (response.message === "Coupon soft deleted successfully") {
+            Swal.fire({
+              icon: "success",
+              title: "Coupon deleted!",
+              text: "The coupon has been soft deleted.",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              location.reload();
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error deleting the coupon.",
+          });
+        },
+      });
+    }
+  });
+}
+
+function restoreCoupon(couponId) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This coupon will be restored.",
+    icon: "info",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, restore it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "PATCH",
+        url: `/admin/restore-coupon/${couponId}`,
+        success: function (response) {
+          if (response.message === "Coupon restored successfully") {
+            Swal.fire({
+              icon: "success",
+              title: "Coupon Restored!",
+              text: "The coupon has been successfully restored.",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              location.reload();
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error restoring the coupon.",
+          });
+        },
+      });
+    }
+  });
+}
+
+</script>
