@@ -17,7 +17,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 60%;
+      height: 50%;
     }
   
     .form-container {
@@ -36,6 +36,16 @@
 
   <!-- Include your header here -->
   <%- include('../../views/partials/user/header') %>
+
+  <div class="mt-4 ps-4 ">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/userProfile">Profile</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Change email</li>
+      </ol>
+    </nav>
 
   <div class="container con mt-5">
     <div class="form-container">
@@ -63,6 +73,7 @@
       </form>
     </div>
   </div>
+</div>
   
 
   <!-- Include Footer -->

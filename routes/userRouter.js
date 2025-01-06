@@ -56,7 +56,6 @@ router.post("/verify-forgotPassOtp", profileController.verifyForgetPassOtp);
 router.post("/resend-forgot-otp", profileController.resendForgetPassOtp);
 router.get(
   "/reset-password",
-  userAuth.isLogout,
   profileController.resetPasswordLoad
 );
 router.post("/reset-password", profileController.resetPassword);
@@ -64,6 +63,18 @@ router.get('/userProfile', profileController.loadUserProfile);
 router.get('/profile/change-email', profileController.loadChangeEmail);
 router.post('/profile/change-email', profileController.changeEmail);
 router.post('/profile/verify-email-otp', profileController.verifyEmailOtp);
+router.get('/profile/new-email', profileController.loadNewMail);
+router.post('/profile/update-email', profileController.updateEmail);
+router.get('/profile/change-password', profileController.loadEmailPageforPassChange);
+router.post('/profile/change-password', profileController.changePassValid);
+router.post('/profile/verify-pass-otp', profileController.verifyChangePassOtp);
+
+//address management
+router.get('/profile/address/add', profileController.loadAddAddress);
+router.post('/profile/address/addAddress', profileController.addAddress);
+router.get('/profile/address/edit', profileController.loadEditAddress);
+router.post('/profile/address/edit', profileController.editAddress);
+router.get('/profile/address/delete', profileController.deleteAddress);
 
 // Product Managemrnt
 router.get("/product-details", productController.loadProductDetails);

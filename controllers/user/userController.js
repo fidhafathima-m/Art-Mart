@@ -63,7 +63,7 @@ const pageNotFound = async (req, res) => {
 
 const loadHomePage = async (req, res) => {
   try {
-    const user = req.session.user;
+    const user = req.session.user; // Check if user is in session
     const categories = await Category.find({ isListed: true });
 
     let productsData = await Product.find({
@@ -72,26 +72,28 @@ const loadHomePage = async (req, res) => {
       // quantity: { $gt: 0 }
     }).select("productName productImage salePrice createdAt regularPrice"); // Optimize fields
 
+    // Sort products by creation date
     productsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    productsData = productsData.slice(0, 4);
+    productsData = productsData.slice(0, 4); // Limit to 4 products
 
     if (productsData.length === 0) {
       console.log("No products found");
       return res.render("home", {
-        user: req.session.user,
+        user: req.session.user || null,  // Pass user data or null if user is not logged in
         product: [],
-        message: "No products available at the moment",
+        message: "No products available at the moment"
       });
     }
 
+    // If user is logged in, fetch user data, otherwise set it to null
     const userData = user ? await User.findOne({ _id: user }) : null;
 
+    // Render the page with user data if the user is logged in, or pass null if not logged in
     if (userData) {
-      res.locals.user = userData;
+      res.locals.user = userData; // Store the user data in locals for global access
       res.render("home", { user: userData, product: productsData });
     } else {
-      console.log("No user found with that ID");
-      res.render("home", { product: productsData });
+      res.render("home", { product: productsData, user: null });  // Pass null if user is not logged in
     }
   } catch (error) {
     console.log("Error loading home page", error.message);

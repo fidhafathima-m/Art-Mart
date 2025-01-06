@@ -278,7 +278,7 @@ function validateOTPForm(event) {
 
   $.ajax({
     type: "POST",
-    url: "/profile/verify-email-otp",  // Correct route for email OTP verification
+    url: "/profile/verify-pass-otp",  // Correct route for email OTP verification
     contentType: "application/json",
     data: JSON.stringify({ otp: otpString }),
     success: function (response) {

@@ -37,9 +37,20 @@
   <!-- Include your header here -->
   <%- include('../../views/partials/user/header') %>
 
+  <div class="mt-4 ps-4 ">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/userProfile">Profile</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Change password</li>
+      </ol>
+    </nav>
+
+
   <div class="container con mt-5">
     <div class="form-container">
-      <h2>Change Email</h2>
+      <h2>Email</h2>
       <!-- Alert for Success/Failure -->
       <!-- <div class="alert alert-success" id="successAlert">
         <strong>Success!</strong> Your email is valid.
@@ -53,17 +64,17 @@
         <% } %>
   
       <!-- Change Email Form -->
-      <form id="changeEmailForm" method="POST" action="/profile/update-email">
+      <form id="changeEmailForm" method="POST" action="/profile/change-password">
         <div class="mb-3 d-flex flex-column justify-content-center">
-          <label for="email" class="form-label">New Email</label>
-          <input type="email" class="form-control w-100" id="newEmail" name="newEmail" placeholder="Enter your current email" required>
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control w-100" id="newEmail" name="newEmail" placeholder="Enter your email" required>
         </div>
   
-        <button type="submit" class="btn btn-primary" id="verifyBtn">Submit</button>
+        <button type="submit" class="btn btn-primary" id="verifyBtn">Verify</button>
       </form>
     </div>
   </div>
-  
+</div>
 
   <!-- Include Footer -->
   <%- include('../../views/partials/user/footer') %>

@@ -134,9 +134,9 @@
               /></a>
               <a href="#"><img src="img/icon/heart.png" alt="" /></a>
               <a href="#"><img src="img/icon/cart.png" alt="" /> </a>
-              <%if(locals.user) {%>
+              <%if(user) {%>
               <div class="dropdown">
-                <a href="#" class="sign-in-link"><%=locals.user.name%></a>
+                <a href="#" class="sign-in-link"><%=user.name%></a>
                 <div class="dropdown-content">
                   <a href="/userProfile">Profile</a>
                   <a href="/logout">Logout</a>
