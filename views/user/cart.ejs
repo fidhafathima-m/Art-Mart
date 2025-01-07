@@ -1,0 +1,144 @@
+<%- include('../../views/partials/user/header', { user: user }) %>
+
+<div class="cart-container" style="display: flex; justify-content: space-between; padding: 20px;">
+  <!-- Left container (shopping cart items) -->
+  <div class="cart-items bg-white p-4 rounded" style="width: 70%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h2>Shopping Cart</h2>
+        <span class="text-muted pe-5" style="text-align: right;">Price</span>
+    </div>
+    <hr />
+    <% cartItems.forEach(item => { %>
+      <div class="cart-item" style="display: flex; align-items: center; margin-bottom: 20px;">
+        <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" style="width: 100px; height: 100px; object-fit: cover; margin-right: 15px;" />
+        <div class="item-details" style="flex-grow: 1;">
+          <h3><%= item.productName %></h3>
+          <% if (item.productStock > 0) { %>
+            <p>In Stock</p>
+          <% } else { %>
+            <p class="text-danger">Out of Stock</p>
+          <% } %>
+          <!-- Quantity Control -->
+          <div class="quantity-control d-flex align-items-center mb-4">
+            <button class="btn btn-light decrease-quantity">
+              <i class="bi bi-dash"></i>
+            </button>
+            <input
+              type="text"
+              class="form-control mx-2 quantity-input"
+              value="<%= item.cartQuantity %>"
+              readonly
+              style="width: 60px; text-align: center"
+              data-product-id="<%= item.productId %>"
+              data-max-quantity="<%= item.productStock %>"
+            />
+            <button class="btn btn-light increase-quantity">
+              <i class="bi bi-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="price-details" style="text-align: right; padding-left: 20px;">
+          <h3>&#8377; <%= item.salePrice %></h3>
+          <% if(item.productOffer > 0) { %>
+            <small class="text-danger"><%= item.productOffer %>% off</small>
+            <% } %>
+        </div>
+      </div>
+      <hr />
+    <% }) %>
+  </div>
+
+  <!-- Right container (subtotal & proceed to buy) -->
+  <div class="subtotal bg-white p-4 rounded ml-4" style="width: 30%; padding: 20px; height: 50%;">
+    <h3>Subtotal: (<%= cartItems.length %> items)</h3>
+    <hr />
+    <div>
+      <% let subtotal = 0; %>
+      <% cartItems.forEach(item => { %>
+        <% subtotal += item.salePrice * item.cartQuantity; %>
+      <% }) %>
+      <p><strong>Total: </strong>&#8377; <%= subtotal %>.00</p>
+    </div>
+    <button class="proceed-to-buy" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer;">
+      Proceed to Buy
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Event listener for increase button
+    document.querySelectorAll('.increase-quantity').forEach(button => {
+      button.addEventListener('click', async (event) => {
+        const input = event.target.closest('.quantity-control').querySelector('.quantity-input');
+        let currentQuantity = parseInt(input.value);
+
+        // Get the maximum quantity from data attribute
+        const maxQuantity = parseInt(input.getAttribute('data-max-quantity'));
+
+        if (currentQuantity < maxQuantity) {
+          currentQuantity++;  // Increase quantity
+          input.value = currentQuantity;  // Update input field
+
+          // Send updated quantity to the server
+          await updateCartQuantity(input.getAttribute('data-product-id'), currentQuantity);
+        } else {
+          alert("You cannot exceed the available stock.");
+        }
+      });
+    });
+
+    // Event listener for decrease button
+    document.querySelectorAll('.decrease-quantity').forEach(button => {
+      button.addEventListener('click', async (event) => {
+        const input = event.target.closest('.quantity-control').querySelector('.quantity-input');
+        let currentQuantity = parseInt(input.value);
+
+        if (currentQuantity > 1) {
+          currentQuantity--;  // Decrease quantity
+          input.value = currentQuantity;  // Update input field
+
+          // Send updated quantity to the server
+          await updateCartQuantity(input.getAttribute('data-product-id'), currentQuantity);
+        } else {
+          alert("Quantity cannot be less than 1.");
+        }
+      });
+    });
+  });
+
+  async function updateCartQuantity(productId, quantity) {
+    try {
+      const response = await fetch('/update-cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: productId,
+          quantity: quantity,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Error response from server:', response.status, response.statusText);
+        alert('There was an error updating the cart. Please try again later.');
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        location.reload();  // Reload the page to show the updated cart
+      } else {
+        console.error('Server error:', data.message || 'Unknown error');
+        alert('Something went wrong while updating the cart.');
+      }
+    } catch (error) {
+      console.error('Error updating cart quantity:', error);
+      alert('There was an error updating the cart.');
+    }
+  }
+</script>
+
+<%- include('../../views/partials/user/footer') %>

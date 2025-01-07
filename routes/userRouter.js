@@ -79,4 +79,9 @@ router.get('/profile/address/delete', profileController.deleteAddress);
 // Product Managemrnt
 router.get("/product-details", productController.loadProductDetails);
 
+// Cart management
+router.get("/cart", productController.loadCart);
+router.get('/addToCart', productController.addToCart);
+router.post('/update-cart', productController.updateCartQuantity);
+
 module.exports = router;

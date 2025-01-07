@@ -399,32 +399,69 @@ const loadAddAddress = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    const userId = req.session.user;
-    const userData = await User.findOne({ _id: userId });
+    console.log("Request Body:", req.body);
+    const userId = req.session.user; // Get userId from session
+    const userData = await User.findOne({ _id: userId }); // Find user from DB
+    if (!userData) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Destructure required fields from req.body for the new address
     const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body;
 
+
+    // Check if all required fields for the new address are present
+    if (!addressType || !name || !city || !state || !pincode || !phone || !altPhone) {
+      return res.status(400).json({ success: false, message: 'All required fields must be filled' });
+    }
+
+    // Check if the address with the same pincode already exists for this user
+    const addressExists = await Address.findOne({ 
+      'address.pincode': pincode, 
+      userId: userData._id 
+    });
+
+    if (addressExists) {
+      return res.status(400).json({ success: false, message: 'This location address already exists' });
+    }
+
+    // Construct the new address object
+    const newAddress = {
+      addressType,
+      name,
+      city,
+      landMark: landMark || '',  // Optional field, can be empty if not provided
+      state,
+      pincode,
+      phone,
+      altPhone
+    };
+
+    // Find the user's address document
     const userAddress = await Address.findOne({ userId: userData._id });
 
     if (!userAddress) {
-      // If no existing address, create new address with an array of one address object
-      const newAddress = new Address({
+      // If no existing address document, create a new one
+      const newAddressDoc = new Address({
         userId: userData._id,
-        address: [{ addressType, name, city, landMark, state, pincode, phone, altPhone }]
+        address: [newAddress]
       });
-      await newAddress.save();
+      await newAddressDoc.save();
     } else {
-      // If user has existing address, push new address object into the array
-      userAddress.address.push({ addressType, name, city, landMark, state, pincode, phone, altPhone });
+      // If user has existing addresses, push the new one
+      userAddress.address.push(newAddress);
       await userAddress.save();
     }
 
-    // Redirect user to the profile page with the updated address section
-    res.redirect('/userProfile?section=addresses');
+    // Respond with success
+    res.status(200).json({ success: true, message: 'Address added successfully' });
+
   } catch (error) {
-    console.log('Error in adding address', error);
-    res.redirect('/pageNotFound');
+    console.error('Error in adding address:', error);
+    res.status(500).json({ success: false, message: 'An error occurred, please try again.' });
   }
 };
+
 
 
     

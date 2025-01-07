@@ -23,7 +23,7 @@ const addressSchema = new Schema({
       },
       landMark: {
         type: String,
-        required: true,
+        required: false,
       },
       state: {
         type: String,
